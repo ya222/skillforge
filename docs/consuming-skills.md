@@ -78,7 +78,7 @@ Content comes from `content:` (inline) or `source:` (a path relative to the conf
 the patch). Patch content is param-substituted like any other body text.
 
 Targeting a block or point that the skill does not declare is an error listing the ones it does.
-Two patches whose spans overlap is an error. See [concepts.md](concepts.md) for the `force: true`
+Two patches whose spans overlap is an error, and so is inserting at a point inside a region another patch removes or rewrites, since the inserted content would be discarded. See [concepts.md](concepts.md) for the `force: true`
 rule when two layers collide.
 
 ### Heading patches

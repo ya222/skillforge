@@ -317,3 +317,65 @@ def test_two_patches_adding_the_same_file_is_an_error(repo):
     )
     with pytest.raises(PatchError, match="more than one patch"):
         build(repo)
+
+
+def test_appending_to_a_block_that_another_patch_removes_is_an_error(repo):
+    make_skill(repo, body=BODY)
+    make_config(
+        repo,
+        skills=[
+            {
+                "from": "./skills/demo",
+                "patches": [
+                    {"block": "rules", "op": "append", "content": "- Lost rule."},
+                    {"block": "rules", "op": "remove"},
+                ],
+            }
+        ],
+    )
+    with pytest.raises(PatchError, match="would be lost"):
+        build(repo)
+
+
+def test_inserting_at_a_point_inside_a_replaced_block_is_an_error(repo):
+    body = (
+        "<!-- skillforge:block id=rules -->\n"
+        "## Rules\n\n"
+        "<!-- skillforge:point id=inside -->\n\n"
+        "- Original rule.\n"
+        "<!-- /skillforge:block -->\n"
+    )
+    make_skill(repo, body=body)
+    make_config(
+        repo,
+        skills=[
+            {
+                "from": "./skills/demo",
+                "patches": [
+                    {"point": "inside", "op": "insert", "content": "Lost context."},
+                    {"block": "rules", "op": "replace", "content": "## Rules\n\n- House rule.\n"},
+                ],
+            }
+        ],
+    )
+    with pytest.raises(PatchError, match="would be lost"):
+        build(repo)
+
+
+def test_two_inserts_at_one_point_both_apply(repo):
+    make_skill(repo, body=BODY)
+    make_config(
+        repo,
+        skills=[
+            {
+                "from": "./skills/demo",
+                "patches": [
+                    {"point": "after-overview", "op": "insert", "content": "First."},
+                    {"point": "after-overview", "op": "insert", "content": "Second."},
+                ],
+            }
+        ],
+    )
+    build_and_write(repo)
+    output = rendered(repo, "demo")
+    assert "First." in output and "Second." in output

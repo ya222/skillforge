@@ -183,3 +183,13 @@ def _reject_overlaps(edits: list[tuple[int, int, str, Patch]], origin: str) -> N
                 f"{origin}: patches overlap in the document: "
                 f"`{left[3].describe()}` and `{right[3].describe()}`"
             )
+    # An insertion is zero-width, so it never trips the check above, but content
+    # inserted into a region another patch removes or rewrites is discarded
+    # without a word. That is the kind of silence this project does not allow.
+    for insertion in (e for e in edits if e[0] == e[1]):
+        for span in spans:
+            if span[0] < insertion[0] < span[1]:
+                raise PatchError(
+                    f"{origin}: `{insertion[3].describe()}` inserts into a region that "
+                    f"`{span[3].describe()}` rewrites, so the inserted content would be lost"
+                )
