@@ -68,3 +68,13 @@ def test_the_shipped_skills_lint_clean():
     from tests.conftest import REPO_ROOT
 
     assert lint_tree(REPO_ROOT / "skills") == []
+
+
+def test_a_published_skill_must_declare_metadata(repo):
+    directory = repo / "skills" / "plain"
+    directory.mkdir(parents=True)
+    (directory / "SKILL.md").write_text(
+        "---\nname: plain\ndescription: A plain skill. Use when linting.\n---\n\nBody.\n"
+    )
+    with pytest.raises(SkillError, match="missing `metadata.skillforge`"):
+        lint_skill(directory)

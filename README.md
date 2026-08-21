@@ -90,6 +90,7 @@ under the MIT licence; attribution travels with the rendered output.
 | [docs/adapters.md](docs/adapters.md) | What each harness gets, and how to add one |
 | [docs/cli.md](docs/cli.md) | Command reference |
 | [docs/local-ci.md](docs/local-ci.md) | Running CI on your machine |
+| [examples/consumer/](examples/consumer/) | A worked consumer repository, built for real |
 | [DECISIONS.md](DECISIONS.md) | Why the design is the way it is |
 | [TODO.md](TODO.md) | Milestones and what is left |
 | [AGENTS.md](AGENTS.md) | Instructions for agents working in this repo |

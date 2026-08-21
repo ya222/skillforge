@@ -29,6 +29,8 @@ packages = ["src/skillforge"]
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+# The source cache holds checkouts of other people's repositories.
+extend-exclude = [".skillforge"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

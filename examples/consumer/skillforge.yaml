@@ -1,0 +1,70 @@
+# A worked example of a repository that consumes skills instead of owning them.
+#
+# It does two things that matter:
+#   1. imports this library over git and configures it with params and anchors
+#   2. imports addyosmani/agent-skills, which knows nothing about skillforge,
+#      and patches it by hash-pinned heading path
+#
+# Build it with: skillforge build --root examples/consumer
+version: 1
+
+sources:
+  # ssh, because this repository is currently private. Switch to the https URL
+  # if and when it goes public.
+  lib:
+    git: git@github.com:ya222/skillforge.git
+    ref: main
+  addy:
+    git: https://github.com/addyosmani/agent-skills.git
+    ref: main
+
+params:
+  test_command: pnpm test
+  languages: [typescript, react]
+  framework: react
+  design_system: our Tailwind theme tokens
+  layers: [frontend]
+  bundle_budget_kb: 150
+
+skills:
+  # Configured through the contract the base skill offers.
+  - from: lib/code-simplification
+    patches:
+      - point: after-overview
+        op: insert
+        content: |
+          > In this repository, never simplify anything under `vendor/` or
+          > `generated/`. Those directories are owned by their generators.
+      - block: verification
+        op: append
+        content: "- [ ] `pnpm lint` passes with no new warnings"
+
+  - from: lib/frontend-ui-engineering
+    params:
+      wcag_level: AAA
+    patches:
+      # This project has no design system of its own yet, so drop the section
+      # that assumes one rather than leaving the agent to guess.
+      - block: loading-and-transitions
+        op: remove
+
+  # Imported straight from a library that has never heard of skillforge: no
+  # anchors, no params, nothing to cooperate with. Patched by heading path,
+  # which is why the section's content hash has to be pinned.
+  - from: addy/performance-optimization
+    as: perf
+    patches:
+      - heading: "Verification"
+        op: append
+        upstream_hash: sha256:8ba09039e580b2d18450ab2284c841f0adc9d55f0a01be75389162860802e117
+        content: |
+          - [ ] `pnpm bench` was run and the result beats the recorded baseline
+          - [ ] The Lighthouse budget in `budgets.json` still passes
+
+targets:
+  claude-code: {}
+  agents-md: {}
+  copilot: {}
+  cursor: {}
+
+output: .agents/skills

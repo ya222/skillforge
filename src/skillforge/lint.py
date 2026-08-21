@@ -28,6 +28,11 @@ def lint_skill(directory: Path) -> list[str]:
     skill = load_skill(directory, origin)
     warnings: list[str] = []
 
+    if not skill.meta.declared:
+        raise SkillError(
+            f"{origin}: missing `metadata.skillforge`; a skill this library publishes declares "
+            "at least a version"
+        )
     if len(skill.name) > MAX_NAME:
         raise SkillError(f"{origin}: name is {len(skill.name)} chars, the limit is {MAX_NAME}")
     if len(skill.description) > MAX_DESCRIPTION:

@@ -83,13 +83,19 @@ class SkillMeta:
     globs: list[str] = field(default_factory=list)
     attribution: str | None = None
     params: dict[str, ParamSpec] = field(default_factory=dict)
+    declared: bool = True
 
     @classmethod
     def parse(cls, raw: Any, origin: str) -> SkillMeta:
+        """Parse `metadata.skillforge`, which a plain Agent Skill will not have.
+
+        Importing a skill from a library that never heard of skillforge has to
+        work, so an absent block yields an unversioned, param-less skill. The
+        linter is what insists on a declaration, and it only runs on skills this
+        repository authors.
+        """
         if raw is None:
-            raise SkillError(
-                f"{origin}: missing `metadata.skillforge`; every skill declares at least a version"
-            )
+            return cls(version="0.0.0", declared=False)
         if not isinstance(raw, dict):
             raise SkillError(f"{origin}: `metadata.skillforge` must be a mapping")
         _reject_unknown(raw, ("version", "globs", "attribution", "params"), origin)

@@ -158,3 +158,17 @@ def test_as_renames_the_rendered_skill(repo):
     make_config(repo, skills=[{"from": "./skills/demo", "as": "renamed"}])
     build_and_write(repo)
     assert "name: renamed" in rendered(repo, "renamed")
+
+
+def test_a_plain_agent_skill_without_skillforge_metadata_renders(repo):
+    directory = repo / "skills" / "plain"
+    directory.mkdir(parents=True)
+    (directory / "SKILL.md").write_text(
+        "---\nname: plain\ndescription: A plain skill. Use when importing foreign libraries.\n"
+        "---\n\n## Rules\n\nBe careful.\n"
+    )
+    make_config(repo, skills=[{"from": "./skills/plain"}])
+    build_and_write(repo)
+    output = rendered(repo, "plain")
+    assert "Be careful." in output
+    assert "version: 0.0.0" in output

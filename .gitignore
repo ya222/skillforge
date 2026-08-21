@@ -1,5 +1,5 @@
 # skillforge source cache (rebuild-only; rendered output is committed)
-.skillforge/cache/
+**/.skillforge/cache/
 
 # python
 __pycache__/
