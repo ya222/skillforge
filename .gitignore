@@ -1,0 +1,11 @@
+# skillforge source cache (rebuild-only; rendered output is committed)
+.skillforge/cache/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/

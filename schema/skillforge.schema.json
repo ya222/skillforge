@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ya222/skillforge/schema/skillforge.schema.json",
+  "title": "skillforge.yaml",
+  "type": "object",
+  "required": ["version"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "extends": {
+      "type": "array",
+      "description": "Source aliases or paths to parent skillforge.yaml files, applied in order.",
+      "items": { "type": "string" }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["git", "ref"],
+        "additionalProperties": false,
+        "properties": {
+          "git": { "type": "string" },
+          "ref": { "type": "string" },
+          "path": { "type": "string", "default": "skills" }
+        }
+      }
+    },
+    "params": {
+      "type": "object",
+      "description": "Repo-wide param values. Skills that do not declare a param ignore it."
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "type": "string" },
+          "as": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "params": { "type": "object" },
+          "patches": { "type": "array", "items": { "$ref": "#/$defs/patch" } }
+        }
+      }
+    },
+    "targets": {
+      "type": "object",
+      "propertyNames": { "enum": ["claude-code", "agents-md", "copilot", "cursor"] },
+      "additionalProperties": { "type": "object" }
+    },
+    "output": { "type": "string", "default": ".agents/skills" }
+  },
+  "$defs": {
+    "patch": {
+      "type": "object",
+      "required": ["op"],
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "enum": [
+            "replace",
+            "append",
+            "prepend",
+            "insert",
+            "remove",
+            "add-file",
+            "remove-file",
+            "set-frontmatter"
+          ]
+        },
+        "block": { "type": "string" },
+        "point": { "type": "string" },
+        "heading": { "type": "string" },
+        "key": { "type": "string" },
+        "file": { "type": "string" },
+        "content": {},
+        "source": { "type": "string" },
+        "upstream_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "force": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

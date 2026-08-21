@@ -1,0 +1,17 @@
+# skillforge builds its own skills with itself. If the tool is awkward to use,
+# this file is where we feel it first.
+version: 1
+
+params:
+  test_command: make test
+
+skills:
+  - from: ./skills/code-simplification
+  - from: ./skills/frontend-ui-engineering
+  - from: ./skills/performance-optimization
+
+targets:
+  claude-code: {}
+  agents-md: {}
+
+output: .agents/skills
