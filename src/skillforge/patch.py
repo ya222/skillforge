@@ -60,6 +60,15 @@ def _content_of(patch: Patch, origin: str) -> str:
     return text.rstrip("\n") + "\n"
 
 
+def _append_position(body: str, start: int, end: int) -> int:
+    """Where an append belongs: after the last non-blank line of the span.
+
+    Appending at the raw end of a span puts the new text after whatever blank
+    lines separate it from the next one, which reads as a gap in the output.
+    """
+    return start + len(body[start:end].rstrip())
+
+
 def _set_path(mapping: dict[str, Any], dotted: str, value: Any, origin: str) -> None:
     parts = dotted.split(".")
     cursor = mapping
@@ -107,7 +116,8 @@ def apply_patches(
             if patch.op == "replace":
                 edits.append((inner_start, inner_end, "\n" + _content_of(patch, where), patch))
             elif patch.op == "append":
-                edits.append((inner_end, inner_end, _content_of(patch, where), patch))
+                position = _append_position(body, inner_start, inner_end)
+                edits.append((position, position, "\n" + _content_of(patch, where), patch))
             elif patch.op == "prepend":
                 edits.append((inner_start, inner_start, "\n" + _content_of(patch, where), patch))
             elif patch.op == "remove":
@@ -139,7 +149,8 @@ def apply_patches(
                     (section.body_start, section.end, _content_of(patch, where) + "\n", patch)
                 )
             elif patch.op == "append":
-                edits.append((section.end, section.end, _content_of(patch, where) + "\n", patch))
+                position = _append_position(body, section.body_start, section.end)
+                edits.append((position, position, "\n" + _content_of(patch, where), patch))
             elif patch.op == "prepend":
                 edits.append(
                     (

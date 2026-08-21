@@ -24,17 +24,17 @@ skills:
     version: 0.0.0
     source_hash: sha256:b14354a5fda4cdcec711dce9f9a8bd7c7288271fa0915e41ad1d2543e54ff9bd
 outputs:
-  .agents/skills/code-simplification/SKILL.md: sha256:147b43bc5994e2cb7d5d620b7afa46eca727b3313c4af5b51de35c3be8d2aa20
+  .agents/skills/code-simplification/SKILL.md: sha256:88a198e678b2afcb8d82e79d64c1ef842435e3ef07f5a54a3e411cdb70f9b9fa
   .agents/skills/frontend-ui-engineering/SKILL.md: sha256:810277d70289628a2738911c00a8b1a6454591ba134cd3ef338292d799e39da0
   .agents/skills/perf/SKILL.md: sha256:dc021548195583aa8fab0d1a68f185b25485e3a8e34f2044214739bb8898f45d
-  .claude/skills/code-simplification/SKILL.md: sha256:147b43bc5994e2cb7d5d620b7afa46eca727b3313c4af5b51de35c3be8d2aa20
+  .claude/skills/code-simplification/SKILL.md: sha256:88a198e678b2afcb8d82e79d64c1ef842435e3ef07f5a54a3e411cdb70f9b9fa
   .claude/skills/frontend-ui-engineering/SKILL.md: sha256:810277d70289628a2738911c00a8b1a6454591ba134cd3ef338292d799e39da0
   .claude/skills/perf/SKILL.md: sha256:dc021548195583aa8fab0d1a68f185b25485e3a8e34f2044214739bb8898f45d
-  .cursor/rules/code-simplification.mdc: sha256:15dee7a0a35a69e653a67ded7c9ec77c7302df5f42975797cb2eafc25a271938
+  .cursor/rules/code-simplification.mdc: sha256:b27fac6989d1082fc446dba4c7eef66180f63fed910278461d4ea1aa907258b7
   .cursor/rules/frontend-ui-engineering.mdc: sha256:b1a5c917ea70df72e7f48756816fdaba274cea494a8615d3dbf45d3cddf93346
   .cursor/rules/perf.mdc: sha256:7b5ffd7787e9a97b26cc9df3a49db5b585d65ebe54bc06b383f1b5200c97b900
   .github/copilot-instructions.md#skillforge: sha256:18629e3cbb955adf5d423416d34df96ee60b4c29e7442490a7780c47b69d1245
-  .github/instructions/code-simplification.instructions.md: sha256:fd63bd892316ebd4dcffdb55aac2b4ebbf72c2e817f70ef7fa4b38dac99d2568
+  .github/instructions/code-simplification.instructions.md: sha256:77643dc57375e6ba185fd3e25d3a129836b7f3256d7de23845601446df78fd86
   .github/instructions/frontend-ui-engineering.instructions.md: sha256:a185bc1ba334b1ffd753b5f8c0036329c048bfe7e8ad9bc9f90c04c2ceda079e
   .github/instructions/perf.instructions.md: sha256:ac7383c51e566b20e79468176aac806e125a98565ba90a737d29e001c35dfb83
   AGENTS.md#skillforge: sha256:6f396e38be210924e73c9e66982cf463a42d04539bea550ec311973be9e2cd37

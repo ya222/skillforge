@@ -1,0 +1,31 @@
+# Layer 3 of 3: the project. This is the layer that gets built.
+#
+# Overrides a param the org set, narrows one the team inherited, and takes over
+# an anchor the org already patched.
+version: 1
+
+extends:
+  - ../team
+
+params:
+  languages: [typescript]
+
+skills:
+  - from: lib/code-simplification
+    params:
+      test_command: pnpm test --filter api
+
+    patches:
+      # The org appended a review rule to this block. This service handles no
+      # user data, so the rule is noise here and the project takes the target
+      # over. `force: true` is what makes that legal, and what leaves a record
+      # in the config that the override was deliberate.
+      #
+      # Forcing replaces the org's patch rather than stacking on it, so anything
+      # from the org rule that should survive has to be restated here.
+      #
+      # Remove `force: true` and rebuild to see the conflict error instead.
+      - block: verification
+        op: append
+        force: true
+        content: "- [ ] The change is behaviour-preserving and the diff is reviewable"

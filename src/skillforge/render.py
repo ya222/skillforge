@@ -72,7 +72,6 @@ def load_layered_config(
             config_module.merge(merged, load(parent_path, entry))
         config_module.merge(merged, current)
         merged.root = current.root
-        merged.present = current.present | merged.present
         return merged
 
     top = load(root / config_module.CONFIG_NAME, "root")

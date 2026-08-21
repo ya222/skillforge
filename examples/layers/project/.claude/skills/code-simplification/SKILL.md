@@ -16,8 +16,8 @@ metadata:
 
 Simplify code by reducing complexity while preserving exact behavior. The goal is not fewer lines — it's code that is easier to read, understand, modify, and debug. Every simplification must pass a simple test: "Would a new team member understand this faster than the original?"
 
-> In this repository, never simplify anything under `vendor/` or
-> `generated/`. Those directories are owned by their generators.
+> Platform team convention: simplification lands as its own commit,
+> never mixed into a feature branch.
 
 ## When to Use
 
@@ -243,30 +243,6 @@ function isValid(input: string): boolean {
 }
 ```
 
-### React / JSX
-
-```tsx
-// SIMPLIFY: Verbose conditional rendering
-// Before
-function UserBadge({ user }: Props) {
-  if (user.isAdmin) {
-    return <Badge variant="admin">Admin</Badge>;
-  } else {
-    return <Badge variant="default">User</Badge>;
-  }
-}
-// After
-function UserBadge({ user }: Props) {
-  const variant = user.isAdmin ? 'admin' : 'default';
-  const label = user.isAdmin ? 'Admin' : 'User';
-  return <Badge variant={variant}>{label}</Badge>;
-}
-
-// SIMPLIFY: Prop drilling through intermediate components
-// Before — consider whether context or composition solves this better.
-// This is a judgment call — flag it, don't auto-refactor.
-```
-
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -293,7 +269,7 @@ function UserBadge({ user }: Props) {
 
 After completing a simplification pass:
 
-- [ ] `pnpm test` passes without modifying any test
+- [ ] `pnpm test --filter api` passes without modifying any test
 - [ ] Build succeeds with no new warnings
 - [ ] Linter/formatter passes (no style regressions)
 - [ ] Each simplification is a reviewable, incremental change
@@ -302,5 +278,5 @@ After completing a simplification pass:
 - [ ] No error handling was removed or weakened
 - [ ] No dead code was left behind (unused imports, unreachable branches)
 - [ ] A teammate or review agent would approve the change as a net improvement
-- [ ] `pnpm lint` passes with no new warnings
+- [ ] The change is behaviour-preserving and the diff is reviewable
 

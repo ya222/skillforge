@@ -59,7 +59,9 @@ patches accumulate.
 
 When two layers patch the same target, the build fails. The later layer takes the target by
 declaring `force: true`, which leaves a record in the config that the override was deliberate.
-Two patches in the *same* layer both apply, in order, because that is one author's intent.
+Forcing **replaces** the earlier layer's patches on that target rather than stacking on them, so
+anything from the earlier patch that should survive has to be restated. Two patches in the
+*same* layer both apply, in order, because that is one author's intent.
 
 ## Output and targets
 

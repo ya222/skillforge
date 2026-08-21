@@ -1,0 +1,31 @@
+# Layer 1 of 3: the organisation.
+#
+# Owns the source, the defaults everyone starts from, and the rules that exist
+# because someone senior lost an argument about them once. Nothing builds here;
+# this file is only ever consumed by a layer below it.
+version: 1
+
+sources:
+  # ssh, because the library is currently private.
+  lib:
+    git: git@github.com:ya222/skillforge.git
+    ref: main
+
+params:
+  test_command: make test
+  languages: [typescript, python, react]
+
+skills:
+  - from: lib/code-simplification
+    patches:
+      - block: verification
+        op: append
+        content: "- [ ] Anything touching auth, crypto or user data was flagged for review"
+
+# Targets and output are set once here and inherited by every layer below,
+# because a layer only overrides them if it says so itself.
+targets:
+  claude-code: {}
+  agents-md: {}
+
+output: .agents/skills

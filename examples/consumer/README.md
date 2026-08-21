@@ -27,5 +27,7 @@ skillforge build --root examples/consumer
 This reaches the network and needs SSH access to the (currently private) library repository, so
 it is not part of `make ci`. The committed output is what a fresh clone gets either way.
 
+For a repository composed from three `extends` layers, see [`../layers/`](../layers/).
+
 To see the hash-pinning work, change the `upstream_hash` on the heading patch to anything else
 and rebuild. The build fails and prints the hash it actually found.

@@ -98,4 +98,8 @@ def merge(base: Config, overlay: Config) -> Config:
         base.targets = overlay.targets
     if "output" in overlay.present:
         base.output = overlay.output
+    # A merged layer carries forward which keys its own parents set, so a value
+    # declared once at the top of an `extends` chain survives every layer below
+    # that stays silent about it.
+    base.present |= overlay.present
     return base

@@ -1,0 +1,20 @@
+# Layer 2 of 3: the team.
+#
+# Narrows the org defaults to how this team actually works, and adds context at
+# an anchor nobody above has claimed. No conflict, so nothing needs forcing.
+version: 1
+
+extends:
+  - ../org
+
+params:
+  test_command: pnpm test
+
+skills:
+  - from: lib/code-simplification
+    patches:
+      - point: after-overview
+        op: insert
+        content: |
+          > Platform team convention: simplification lands as its own commit,
+          > never mixed into a feature branch.

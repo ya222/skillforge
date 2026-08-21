@@ -153,3 +153,24 @@ def test_circular_extends_is_an_error(repo):
     make_config(repo, extends=["./org"], skills=[{"from": "./skills/demo"}])
     with pytest.raises(ConfigError, match="circular"):
         build(repo)
+
+
+def test_targets_and_output_survive_two_levels_of_extends(repo):
+    make_skill(repo, body=BODY)
+    make_layer(
+        repo,
+        "org",
+        {
+            "skills": [{"from": "../skills/demo"}],
+            "targets": {"claude-code": {}, "cursor": {}},
+            "output": "rendered/skills",
+        },
+    )
+    make_layer(repo, "team", {"extends": ["../org"]})
+    # Not make_config: that helper always writes a `targets` key, which would
+    # override the org layer and hide what this test is about.
+    make_layer(repo, ".", {"extends": ["./team"], "skills": []})
+    build_and_write(repo)
+    assert (repo / "rendered/skills/demo/SKILL.md").is_file()
+    assert (repo / ".claude/skills/demo/SKILL.md").is_file()
+    assert (repo / ".cursor/rules/demo.mdc").is_file()
