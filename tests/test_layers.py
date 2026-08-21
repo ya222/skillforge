@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 import yaml
-from tests.conftest import make_config, make_skill, rendered
-from tests.test_render import build_and_write
 
 from skillforge.errors import ConfigError, PatchError
 from skillforge.render import build
+from tests.conftest import make_config, make_skill, rendered
+from tests.test_render import build_and_write
 
 BODY = """
 <!-- skillforge:block id=rules -->

@@ -5,11 +5,11 @@ from __future__ import annotations
 import pytest
 import yaml
 from click.testing import CliRunner
+
+from skillforge.cli import main
 from tests.conftest import make_config, make_skill, rendered
 from tests.test_render import build_and_write
 from tests.test_sources import make_upstream
-
-from skillforge.cli import main
 
 
 def run(*args):

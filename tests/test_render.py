@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
-from tests.conftest import make_config, make_skill, rendered
 
 from skillforge.errors import ParamError, SkillError
 from skillforge.plan import apply
 from skillforge.render import build
+from tests.conftest import make_config, make_skill, rendered
 
 LANG_BODY = """
 Run {{ params.test_command }} before you finish.

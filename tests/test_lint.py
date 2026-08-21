@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
-from tests.conftest import make_skill
 
 from skillforge.errors import SkillError
 from skillforge.lint import lint_skill, lint_tree
+from tests.conftest import make_skill
 
 
 def test_a_clean_skill_lints_without_warnings(repo):

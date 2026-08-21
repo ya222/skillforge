@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import pytest
-from tests.conftest import make_config, make_skill
-from tests.test_render import build_and_write
 
 from skillforge import lock as lock_module
 from skillforge.errors import DriftError
 from skillforge.plan import diff
 from skillforge.render import build
+from tests.conftest import make_config, make_skill
+from tests.test_render import build_and_write
 
 
 def setup(repo):

@@ -35,6 +35,9 @@ extend-exclude = [".skillforge"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["skillforge", "tests"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

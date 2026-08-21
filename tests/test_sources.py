@@ -6,14 +6,14 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from tests.conftest import make_config, make_skill, rendered
-from tests.test_render import build_and_write
 
 from skillforge import lock as lock_module
 from skillforge.errors import SourceError
 from skillforge.model import Source
 from skillforge.render import build
 from skillforge.sources import fetch
+from tests.conftest import make_config, make_skill, rendered
+from tests.test_render import build_and_write
 
 
 def git(args, cwd):
