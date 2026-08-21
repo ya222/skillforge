@@ -24,6 +24,9 @@ repo means that 90% drifts. Importing it and patching the 10% means it does not.
 
 ## Quickstart, as a consumer
 
+> This repository is currently private, so the https URLs below only work for people with
+> access. Use `git+ssh://git@github.com/ya222/skillforge` until it goes public.
+
 ```bash
 uvx --from git+https://github.com/ya222/skillforge skillforge init
 ```

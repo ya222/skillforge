@@ -38,7 +38,7 @@ change instead, which is the intended pressure.
 Deliberate. See [DECISIONS.md](../DECISIONS.md), decision 12.
 
 The tradeoff is real: nothing verifies a push from a machine with hooks uninstalled. The
-mitigations are that `make ci` is fast (under a second), that committed output makes staleness
+mitigations are that `make ci` is fast (about a second), that committed output makes staleness
 visible in review as a missing diff, and that `skillforge check` reproduces the whole build from
 the lockfile, so anyone can verify a commit locally.
 

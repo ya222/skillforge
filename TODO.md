@@ -56,7 +56,7 @@ mechanics live in [docs/](docs/). This file tracks only what is done and what is
 
 - [x] JSON Schema for `skillforge.yaml`
 - [x] README, AGENTS.md, docs, DECISIONS.md
-- [ ] Tag `v0.1.0`
+- [x] Tag `v0.1.0`
 - [ ] Decide whether the repository goes public (currently private)
 
 ## Backlog
