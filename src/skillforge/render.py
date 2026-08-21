@@ -55,23 +55,32 @@ def load_layered_config(
     """Resolve `extends` depth-first, fetching any source a layer is pulled from."""
     refresh = refresh or set()
     resolved: dict[str, ResolvedSource] = {}
-    visited: set[Path] = set()
+    # `chain` is the path currently being walked, so a cycle is detected without
+    # mistaking a diamond for one. `merged` records layers already folded in, so
+    # a layer two branches share contributes once rather than twice.
+    chain: list[Path] = []
+    merged_already: set[Path] = set()
 
     def pinned(alias: str) -> str | None:
         return None if alias in refresh else lock.commit_for(alias)
 
     def load(path: Path, layer: str) -> Config:
         real = path.resolve()
-        if real in visited:
-            raise ConfigError(f"{path}: circular `extends` chain")
-        visited.add(real)
+        if real in chain:
+            cycle = " -> ".join(str(p) for p in [*chain, real])
+            raise ConfigError(f"circular `extends` chain: {cycle}")
+        chain.append(real)
         current = config_module.parse_layer(path, layer)
         merged = Config(root=current.root)
         for entry in current.extends:
             parent_path = _extends_path(entry, current, root, pinned, resolved, path)
+            if parent_path.resolve() in merged_already:
+                continue
             config_module.merge(merged, load(parent_path, entry))
         config_module.merge(merged, current)
         merged.root = current.root
+        merged_already.add(real)
+        chain.pop()
         return merged
 
     top = load(root / config_module.CONFIG_NAME, "root")
@@ -140,7 +149,14 @@ def render_skill(
             continue
         raw = (directory / relative).read_bytes()
         if relative.endswith(TEXT_SUFFIXES):
-            raw = substitute(raw.decode("utf-8"), params, f"{origin} file `{relative}`").encode()
+            try:
+                text = raw.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise SkillError(
+                    f"{origin}: bundled file `{relative}` has a text extension but is not valid "
+                    "UTF-8, so params cannot be substituted into it. Rename it if it is binary."
+                ) from exc
+            raw = substitute(text, params, f"{origin} file `{relative}`").encode()
         files[relative] = raw
     for relative in patched.removed_files:
         if relative not in base.files:
@@ -175,6 +191,12 @@ def render_skill(
 def build(root: Path, refresh: set[str] | None = None) -> Build:
     lock = lock_module.load(root)
     config, resolved = load_layered_config(root, lock, refresh)
+    unknown = sorted((refresh or set()) - set(config.sources))
+    if unknown:
+        known = ", ".join(sorted(config.sources)) or "none"
+        raise ConfigError(
+            f"cannot refresh unknown source(s) {', '.join(unknown)} (declared: {known})"
+        )
     if not config.skills:
         raise ConfigError(f"{root / config_module.CONFIG_NAME}: no skills listed")
 

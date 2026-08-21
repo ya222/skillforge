@@ -95,6 +95,8 @@ def apply_patches(
     for patch in patches:
         where = f"{origin}: {patch.describe()}"
         if patch.op == "add-file":
+            if patch.file in result.added_files:
+                raise PatchError(f"{where}: `{patch.file}` is added by more than one patch")
             result.added_files[patch.file] = _content_of(patch, where)
             continue
         if patch.op == "remove-file":

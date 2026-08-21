@@ -255,3 +255,65 @@ def test_set_frontmatter(repo):
     )
     build_and_write(repo)
     assert "description: Rewritten. Use when testing." in rendered(repo, "demo")
+
+
+def test_a_heading_after_a_deeper_one_is_not_nested_under_it(repo):
+    """A document that jumps from h3 back to h2 must not nest the h2."""
+    body = "### Deep\n\ntext\n\n## Shallow\n\nmore\n"
+    make_skill(repo, body=body)
+    pinned = section_hash("## Shallow\n\nmore\n")
+    make_config(
+        repo,
+        skills=[
+            {
+                "from": "./skills/demo",
+                "patches": [
+                    {
+                        "heading": "Shallow",
+                        "op": "append",
+                        "content": "Tail.",
+                        "upstream_hash": pinned,
+                    }
+                ],
+            }
+        ],
+    )
+    build_and_write(repo)
+    output = rendered(repo, "demo")
+    assert output.index("more") < output.index("Tail.")
+
+    with pytest.raises(PatchError, match="not found"):
+        make_config(
+            repo,
+            skills=[
+                {
+                    "from": "./skills/demo",
+                    "patches": [
+                        {
+                            "heading": "Deep > Shallow",
+                            "op": "remove",
+                            "upstream_hash": pinned,
+                        }
+                    ],
+                }
+            ],
+        )
+        build(repo)
+
+
+def test_two_patches_adding_the_same_file_is_an_error(repo):
+    make_skill(repo, body=BODY)
+    make_config(
+        repo,
+        skills=[
+            {
+                "from": "./skills/demo",
+                "patches": [
+                    {"op": "add-file", "file": "a.md", "content": "one"},
+                    {"op": "add-file", "file": "a.md", "content": "two"},
+                ],
+            }
+        ],
+    )
+    with pytest.raises(PatchError, match="more than one patch"):
+        build(repo)

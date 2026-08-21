@@ -33,9 +33,12 @@ def load_skill(directory: Path, origin: str | None = None) -> Skill:
     meta = SkillMeta.parse(meta_raw, origin)
 
     files = sorted(
-        str(p.relative_to(directory).as_posix())
-        for p in directory.rglob("*")
-        if p.is_file() and p.name != SKILL_FILE
+        relative
+        for relative in (
+            p.relative_to(directory).as_posix() for p in directory.rglob("*") if p.is_file()
+        )
+        # Only the skill's own SKILL.md is special; one bundled as a reference is not.
+        if relative != SKILL_FILE
     )
     return Skill(
         name=name,

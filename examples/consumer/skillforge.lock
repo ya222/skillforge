@@ -30,9 +30,9 @@ outputs:
   .claude/skills/code-simplification/SKILL.md: sha256:88a198e678b2afcb8d82e79d64c1ef842435e3ef07f5a54a3e411cdb70f9b9fa
   .claude/skills/frontend-ui-engineering/SKILL.md: sha256:810277d70289628a2738911c00a8b1a6454591ba134cd3ef338292d799e39da0
   .claude/skills/perf/SKILL.md: sha256:dc021548195583aa8fab0d1a68f185b25485e3a8e34f2044214739bb8898f45d
-  .cursor/rules/code-simplification.mdc: sha256:b27fac6989d1082fc446dba4c7eef66180f63fed910278461d4ea1aa907258b7
-  .cursor/rules/frontend-ui-engineering.mdc: sha256:b1a5c917ea70df72e7f48756816fdaba274cea494a8615d3dbf45d3cddf93346
-  .cursor/rules/perf.mdc: sha256:7b5ffd7787e9a97b26cc9df3a49db5b585d65ebe54bc06b383f1b5200c97b900
+  .cursor/rules/code-simplification.mdc: sha256:2379a50752a6a846e4197c8ee56c90c6def4c8eedb257f94062f570a43f9bb90
+  .cursor/rules/frontend-ui-engineering.mdc: sha256:7bf65183763e96116100e2cd2b8ce2643f1265c2f605679483664fc66b5c967d
+  .cursor/rules/perf.mdc: sha256:42a39904f2292e6f954aab19eb36f306bacdeb33fe2f8067339c03d3cffebcbc
   .github/copilot-instructions.md#skillforge: sha256:18629e3cbb955adf5d423416d34df96ee60b4c29e7442490a7780c47b69d1245
   .github/instructions/code-simplification.instructions.md: sha256:77643dc57375e6ba185fd3e25d3a129836b7f3256d7de23845601446df78fd86
   .github/instructions/frontend-ui-engineering.instructions.md: sha256:a185bc1ba334b1ffd753b5f8c0036329c048bfe7e8ad9bc9f90c04c2ceda079e

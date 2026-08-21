@@ -172,3 +172,22 @@ def test_a_plain_agent_skill_without_skillforge_metadata_renders(repo):
     output = rendered(repo, "plain")
     assert "Be careful." in output
     assert "version: 0.0.0" in output
+
+
+def test_a_bundled_file_named_skill_md_is_not_dropped(repo):
+    directory = make_skill(repo, body="Body.\n")
+    (directory / "references").mkdir()
+    (directory / "references" / "SKILL.md").write_text(
+        "A reference that happens to be named that.\n"
+    )
+    make_config(repo, skills=[{"from": "./skills/demo"}], targets={})
+    build_and_write(repo)
+    assert (repo / ".agents/skills/demo/references/SKILL.md").is_file()
+
+
+def test_a_text_file_that_is_not_utf8_fails_with_a_named_error(repo):
+    directory = make_skill(repo, body="Body.\n")
+    (directory / "blob.txt").write_bytes(b"\xff\xfe\x00binary")
+    make_config(repo, skills=[{"from": "./skills/demo"}], targets={})
+    with pytest.raises(SkillError, match="not valid UTF-8"):
+        build(repo)

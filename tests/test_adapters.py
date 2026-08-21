@@ -44,18 +44,22 @@ def test_agents_md_rebuild_replaces_only_the_region(repo):
 
 
 def test_copilot_writes_instruction_files_with_apply_to(repo):
+    import yaml
+
     setup(repo, {"copilot": {}})
     instructions = (repo / ".github/instructions/demo.instructions.md").read_text()
-    assert "applyTo: '**/*.py'" in instructions
+    assert yaml.safe_load(instructions.split("---")[1])["applyTo"] == "**/*.py"
     assert "Be careful." in instructions
     assert "`demo`" in (repo / ".github/copilot-instructions.md").read_text()
 
 
 def test_cursor_writes_one_mdc_per_skill(repo):
+    import yaml
+
     setup(repo, {"cursor": {}})
-    rule = (repo / ".cursor/rules/demo.mdc").read_text()
-    assert "globs: **/*.py" in rule
-    assert "alwaysApply: false" in rule
+    front = yaml.safe_load((repo / ".cursor/rules/demo.mdc").read_text().split("---")[1])
+    assert front["globs"] == "**/*.py"
+    assert front["alwaysApply"] is False
 
 
 def test_removing_a_skill_prunes_its_generated_files(repo):
@@ -70,3 +74,36 @@ def test_removing_a_skill_prunes_its_generated_files(repo):
     assert not (repo / ".claude/skills/demo").exists()
     assert not (repo / ".cursor/rules/demo.mdc").exists()
     assert (repo / ".claude/skills/other/SKILL.md").exists()
+
+
+TRICKY = "Reviews code: carefully. Use when reviewing 'quoted' things & #tags."
+
+
+def test_cursor_frontmatter_survives_a_colon_in_the_description(repo):
+    import yaml
+
+    make_skill(repo, description=TRICKY, body=BODY, globs=["**/*.py"])
+    make_config(repo, skills=[{"from": "./skills/demo"}], targets={"cursor": {}})
+    build_and_write(repo)
+    front = (repo / ".cursor/rules/demo.mdc").read_text().split("---")[1]
+    assert yaml.safe_load(front)["description"] == TRICKY
+
+
+def test_copilot_frontmatter_survives_a_colon_in_the_description(repo):
+    import yaml
+
+    make_skill(repo, description=TRICKY, body=BODY, globs=["**/*.py"])
+    make_config(repo, skills=[{"from": "./skills/demo"}], targets={"copilot": {}})
+    build_and_write(repo)
+    text = (repo / ".github/instructions/demo.instructions.md").read_text()
+    assert yaml.safe_load(text.split("---")[1])["description"] == TRICKY
+
+
+def test_a_multi_line_description_stays_on_one_line_in_the_index(repo):
+    make_skill(repo, description="One. Use when testing.\nTwo.", body=BODY)
+    make_config(repo, skills=[{"from": "./skills/demo"}], targets={"agents-md": {}})
+    build_and_write(repo)
+    bullets = [
+        line for line in (repo / "AGENTS.md").read_text().splitlines() if line.startswith("- [")
+    ]
+    assert bullets == ["- [`demo`](.agents/skills/demo/SKILL.md) — One. Use when testing. Two."]

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from skillforge.adapters.copilot import one_line
 from skillforge.model import Config
 from skillforge.plan import Plan, RegionWrite
 
@@ -27,5 +28,5 @@ def apply(skills: list[Any], config: Config, options: dict[str, Any], plan: Plan
     ]
     for skill in sorted(skills, key=lambda s: s.name):
         target = f"{config.output}/{skill.name}/SKILL.md"
-        lines.append(f"- [`{skill.name}`]({target}) — {skill.description}")
+        lines.append(f"- [`{skill.name}`]({target}) — {one_line(skill.description)}")
     plan.regions.append(RegionWrite(path=path, content="\n".join(lines)))

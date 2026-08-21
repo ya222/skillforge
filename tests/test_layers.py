@@ -174,3 +174,33 @@ def test_targets_and_output_survive_two_levels_of_extends(repo):
     assert (repo / "rendered/skills/demo/SKILL.md").is_file()
     assert (repo / ".claude/skills/demo/SKILL.md").is_file()
     assert (repo / ".cursor/rules/demo.mdc").is_file()
+
+
+def test_a_diamond_of_layers_is_not_a_cycle(repo):
+    """project -> (teamA, teamB) -> org. The shared layer contributes once."""
+    make_skill(repo, body=BODY)
+    make_layer(
+        repo,
+        "org",
+        {
+            "skills": [
+                {
+                    "from": "../skills/demo",
+                    "patches": [{"block": "rules", "op": "append", "content": "- Org rule."}],
+                }
+            ]
+        },
+    )
+    make_layer(repo, "teamA", {"extends": ["../org"]})
+    make_layer(repo, "teamB", {"extends": ["../org"]})
+    make_config(repo, extends=["./teamA", "./teamB"], skills=[])
+    build_and_write(repo)
+    assert rendered(repo, "demo").count("- Org rule.") == 1
+
+
+def test_a_real_cycle_names_the_chain(repo):
+    make_skill(repo, body=BODY)
+    make_layer(repo, "org", {"extends": ["../skillforge.yaml"], "skills": []})
+    make_config(repo, extends=["./org"], skills=[{"from": "./skills/demo"}])
+    with pytest.raises(ConfigError, match="circular `extends` chain"):
+        build(repo)

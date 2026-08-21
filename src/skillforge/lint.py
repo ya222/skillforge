@@ -89,6 +89,10 @@ def lint_skill(directory: Path) -> list[str]:
         target = match.group("target")
         if target.startswith(("http://", "https://", "#", "mailto:")):
             continue
+        # A link may carry a fragment or query; only the path part is a file.
+        target = target.split("#", 1)[0].split("?", 1)[0]
+        if not target:
+            continue
         if not (directory / target).exists():
             raise SkillError(f"{origin}: link target `{target}` does not exist in the skill")
 

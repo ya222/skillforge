@@ -69,10 +69,13 @@ def parse_sections(body: str) -> list[Section]:
             )
 
     sections: list[Section] = []
-    stack: list[str] = []
+    # (level, title) rather than one slot per level: a document that jumps from
+    # h3 to h2 must not nest the h2 under the h3.
+    stack: list[tuple[int, str]] = []
     for position, (index, level, title, offset) in enumerate(found):
-        del stack[level - 1 :]
-        stack.append(title)
+        while stack and stack[-1][0] >= level:
+            stack.pop()
+        stack.append((level, title))
         end = len(body)
         for other_index, other_level, _, other_offset in found[position + 1 :]:
             del other_index
@@ -83,7 +86,7 @@ def parse_sections(body: str) -> list[Section]:
             Section(
                 level=level,
                 title=title,
-                path=tuple(stack),
+                path=tuple(entry[1] for entry in stack),
                 start=offset,
                 body_start=offset + len(lines[index]),
                 end=end,

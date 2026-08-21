@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from skillforge import lock as lock_module
-from skillforge.errors import SourceError
+from skillforge.errors import ConfigError, SourceError
 from skillforge.model import Source
 from skillforge.render import build
 from skillforge.sources import fetch
@@ -105,3 +105,12 @@ def test_extends_a_config_in_a_git_source(tmp_path):
     )
     build_and_write(consumer)
     assert "Original." in rendered(consumer, "imported")
+
+
+def test_refreshing_a_source_that_does_not_exist_is_an_error(tmp_path):
+    consumer = tmp_path / "consumer"
+    consumer.mkdir()
+    make_skill(consumer, body="Body.\n")
+    make_config(consumer, skills=[{"from": "./skills/demo"}], targets={})
+    with pytest.raises(ConfigError, match="cannot refresh unknown source"):
+        build(consumer, refresh={"nosuchsource"})

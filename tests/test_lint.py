@@ -78,3 +78,10 @@ def test_a_published_skill_must_declare_metadata(repo):
     )
     with pytest.raises(SkillError, match="missing `metadata.skillforge`"):
         lint_skill(directory)
+
+
+def test_a_relative_link_with_a_fragment_resolves_to_the_file(repo):
+    directory = make_skill(repo, body="See [the reference](references/there.md#section).\n")
+    (directory / "references").mkdir()
+    (directory / "references" / "there.md").write_text("hi\n")
+    assert lint_skill(directory) == []
