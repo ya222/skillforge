@@ -2,13 +2,8 @@
 # this file is where we feel it first.
 version: 1
 
-params:
-  test_command: make test
-
 skills:
-  - from: ./skills/code-simplification
-  - from: ./skills/frontend-ui-engineering
-  - from: ./skills/performance-optimization
+  - from: ./skills/eli5
 
 targets:
   claude-code: {}

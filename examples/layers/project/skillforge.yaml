@@ -8,24 +8,24 @@ extends:
   - ../team
 
 params:
-  languages: [typescript]
+  audience: an on-call engineer at 3am
 
 skills:
-  - from: lib/code-simplification
+  - from: lib/eli5
     params:
-      test_command: pnpm test --filter api
+      max_words: 120
 
     patches:
-      # The org appended a review rule to this block. This service handles no
-      # user data, so the rule is noise here and the project takes the target
-      # over. `force: true` is what makes that legal, and what leaves a record
-      # in the config that the override was deliberate.
+      # The org appended a rule to this block. This is an internal tooling
+      # service with no customers, so the rule is noise here and the project
+      # takes the target over. `force: true` is what makes that legal, and
+      # what leaves a record in the config that the override was deliberate.
       #
       # Forcing replaces the org's patch rather than stacking on it, so anything
       # from the org rule that should survive has to be restated here.
       #
       # Remove `force: true` and rebuild to see the conflict error instead.
-      - block: verification
+      - block: rules
         op: append
         force: true
-        content: "- [ ] The change is behaviour-preserving and the diff is reviewable"
+        content: "- Lead with what to do, then why; the why can wait until the pager is quiet"

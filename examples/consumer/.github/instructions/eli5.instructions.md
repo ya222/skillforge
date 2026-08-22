@@ -1,0 +1,27 @@
+---
+applyTo: '**'
+description: Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
+---
+
+# eli5
+
+Explain like I'm a product manager who has never opened the codebase: someone who knows nothing about this topic. Big
+pictures, few words.
+
+Topic: $ARGUMENTS
+
+> Explainers here describe *our* system. Name the real service, queue
+> or table; never a made-up stand-in.
+
+## Rules
+
+- One idea per picture. If a picture needs a paragraph, it is two pictures.
+- No more than 300 words in total, captions included.
+- Every word a product manager who has never opened the codebase would not already know gets an everyday analogy, not a definition.
+- End with the one sentence the reader should be able to repeat afterwards.
+- Link the runbook or ADR the explainer is summarising, if one exists
+
+## The markdown
+
+Deliver plain markdown. Stand in for each picture with a fenced block describing what it would
+show, so the reader can draw it or swap in a real image later.

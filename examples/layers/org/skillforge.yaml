@@ -12,15 +12,15 @@ sources:
     ref: main
 
 params:
-  test_command: make test
-  languages: [typescript, python, react]
+  audience: a new hire on their first day
+  max_words: 300
 
 skills:
-  - from: lib/code-simplification
+  - from: lib/eli5
     patches:
-      - block: verification
+      - block: rules
         op: append
-        content: "- [ ] Anything touching auth, crypto or user data was flagged for review"
+        content: "- Never reveal a customer name, even as an example"
 
 # Targets and output are set once here and inherited by every layer below,
 # because a layer only overrides them if it says so itself.

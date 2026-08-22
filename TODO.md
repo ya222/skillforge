@@ -40,16 +40,15 @@ mechanics live in [docs/](docs/). This file tracks only what is done and what is
 
 ## M4 — Seed content ✅
 
-- [x] `code-simplification`, `frontend-ui-engineering`, `performance-optimization` vendored,
-      anchored and parameterised
+- [x] `eli5` vendored, anchored and parameterised
 - [x] The repository self-hosts: it builds its own skills with its own tool
 - [x] Skill linter with the rules in [docs/authoring-skills.md](docs/authoring-skills.md)
 
 ## M5 — Proof ✅
 
 - [x] `examples/consumer/` importing this library over git
-- [x] The same example importing `addyosmani/agent-skills` live and patching it by hash-pinned
-      heading path
+- [x] The same example importing `anthropics/claude-plugins-community` live and patching it by
+      hash-pinned heading path
 - [x] A second example showing three-layer `extends` (org → team → project)
 
 ## M6 — Ship ⏳

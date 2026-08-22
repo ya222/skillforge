@@ -40,15 +40,15 @@ sources:
   lib: { git: https://github.com/ya222/skillforge, ref: main }
 
 params:
-  test_command: pnpm test
-  languages: [typescript]
+  audience: a new hire on their first day
+  max_words: 300
 
 skills:
-  - from: lib/code-simplification
+  - from: lib/eli5
     patches:
-      - point: after-overview
+      - point: after-intro
         op: insert
-        content: "> Never simplify anything under `vendor/`."
+        content: "> Assume the reader has seen our architecture diagram and nothing else."
 
 targets:
   claude-code: {}
@@ -76,12 +76,10 @@ params and marks the passages consumers are allowed to change. See
 
 | Skill | What it does |
 | --- | --- |
-| [`code-simplification`](skills/code-simplification/SKILL.md) | Reduce complexity without changing behavior |
-| [`frontend-ui-engineering`](skills/frontend-ui-engineering/SKILL.md) | Build accessible, production-quality UI |
-| [`performance-optimization`](skills/performance-optimization/SKILL.md) | Measure, fix and verify performance work |
+| [`eli5`](skills/eli5/SKILL.md) | Explain a topic with big pictures and few words |
 
-All three are adapted from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
-under the MIT licence; attribution travels with the rendered output.
+Adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
+under the Apache-2.0 licence; attribution travels with the rendered output.
 
 ## Documentation
 

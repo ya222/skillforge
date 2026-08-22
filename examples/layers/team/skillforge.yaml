@@ -8,13 +8,13 @@ extends:
   - ../org
 
 params:
-  test_command: pnpm test
+  max_words: 200
 
 skills:
-  - from: lib/code-simplification
+  - from: lib/eli5
     patches:
-      - point: after-overview
+      - point: after-intro
         op: insert
         content: |
-          > Platform team convention: simplification lands as its own commit,
-          > never mixed into a feature branch.
+          > Platform team convention: every explainer links the dashboard that
+          > shows the thing it explains.

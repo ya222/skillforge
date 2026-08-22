@@ -2,8 +2,9 @@
 #
 # It does two things that matter:
 #   1. imports this library over git and configures it with params and anchors
-#   2. imports addyosmani/agent-skills, which knows nothing about skillforge,
-#      and patches it by hash-pinned heading path
+#   2. imports the same skill's upstream, anthropics/claude-plugins-community,
+#      which knows nothing about skillforge, and patches it by hash-pinned
+#      heading path
 #
 # Build it with: skillforge build --root examples/consumer
 version: 1
@@ -14,52 +15,43 @@ sources:
   lib:
     git: git@github.com:ya222/skillforge.git
     ref: main
-  addy:
-    git: https://github.com/addyosmani/agent-skills.git
+  upstream:
+    git: https://github.com/anthropics/claude-plugins-community.git
     ref: main
+    path: eli5/skills
 
 params:
-  test_command: pnpm test
-  languages: [typescript, react]
-  framework: react
-  design_system: our Tailwind theme tokens
-  layers: [frontend]
-  bundle_budget_kb: 150
+  audience: a product manager who has never opened the codebase
+  max_words: 300
 
 skills:
   # Configured through the contract the base skill offers.
-  - from: lib/code-simplification
+  - from: lib/eli5
+    params:
+      # This repository's explainers land in pull request descriptions, so the
+      # `artifact` block disappears and the `markdown` block takes its place.
+      medium: markdown
     patches:
-      - point: after-overview
+      - point: after-intro
         op: insert
         content: |
-          > In this repository, never simplify anything under `vendor/` or
-          > `generated/`. Those directories are owned by their generators.
-      - block: verification
+          > Explainers here describe *our* system. Name the real service, queue
+          > or table; never a made-up stand-in.
+      - block: rules
         op: append
-        content: "- [ ] `pnpm lint` passes with no new warnings"
+        content: "- Link the runbook or ADR the explainer is summarising, if one exists"
 
-  - from: lib/frontend-ui-engineering
-    params:
-      wcag_level: AAA
-    patches:
-      # This project has no design system of its own yet, so drop the section
-      # that assumes one rather than leaving the agent to guess.
-      - block: loading-and-transitions
-        op: remove
-
-  # Imported straight from a library that has never heard of skillforge: no
+  # Imported straight from a repository that has never heard of skillforge: no
   # anchors, no params, nothing to cooperate with. Patched by heading path,
   # which is why the section's content hash has to be pinned.
-  - from: addy/performance-optimization
-    as: perf
+  - from: upstream/eli5
+    as: eli5-upstream
     patches:
-      - heading: "Verification"
+      - heading: "eli5"
         op: append
-        upstream_hash: sha256:8ba09039e580b2d18450ab2284c841f0adc9d55f0a01be75389162860802e117
+        upstream_hash: sha256:38064caba9aae8761094ec2b4ba9d64f907fec024ae28f15d2faf3b362129591
         content: |
-          - [ ] `pnpm bench` was run and the result beats the recorded baseline
-          - [ ] The Lighthouse budget in `budgets.json` still passes
+          End with the one sentence the reader should be able to repeat afterwards.
 
 targets:
   claude-code: {}

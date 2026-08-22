@@ -13,20 +13,20 @@ extends:
   - org                      # a source alias, or a path like ../shared
 
 sources:
-  lib:  { git: https://github.com/ya222/skillforge, ref: v0.1.0 }
-  addy: { git: https://github.com/addyosmani/agent-skills, ref: main, path: skills }
+  lib:      { git: https://github.com/ya222/skillforge, ref: v0.1.0 }
+  upstream: { git: https://github.com/anthropics/claude-plugins-community, ref: main, path: eli5/skills }
 
 params:
-  test_command: pnpm test
-  languages: [typescript]
+  audience: a new hire
+  max_words: 300
 
 skills:
-  - from: lib/code-simplification
-    as: simplify                       # optional rename
+  - from: lib/eli5
+    as: explain                        # optional rename
     params:
-      test_command: pnpm test --filter web
+      medium: markdown
     patches:
-      - { block: verification, op: append, content: "- [ ] `pnpm lint` passes" }
+      - { block: rules, op: append, content: "- Link the runbook at the end" }
 
   - from: ./skills/house-style          # a skill this repo owns
 
@@ -84,9 +84,9 @@ rule when two layers collide.
 ### Heading patches
 
 ```yaml
-- heading: "Verification"
+- heading: "eli5"
   op: append
-  content: "- [ ] `pnpm bench` beats the baseline"
+  content: "Always end with the one sentence the reader should remember."
   upstream_hash: sha256:9f2a…
 ```
 

@@ -9,25 +9,25 @@ in the frontmatter.
 
 ```yaml
 ---
-name: code-simplification
-description: Simplifies code for clarity. Use when refactoring code for clarity without changing behavior.
+name: eli5
+description: Explain a topic like I'm a 5 year old. Use when the user asks for a dead-simple picture explainer of how something works.
 metadata:
   skillforge:
     version: 1.0.0
     globs:
       - "**/*"
     attribution: >-
-      Adapted from addyosmani/agent-skills (MIT), skills/code-simplification at df1edb2e0548.
+      Adapted from anthropics/claude-plugins-community (Apache-2.0), eli5/skills/eli5 at f4c9452f5ca0.
     params:
-      test_command:
+      audience:
         type: string
-        description: Command that runs the project's test suite.
-        default: the project's test suite
-      languages:
-        type: list
-        items: [typescript, python, react]
-        description: Which language-specific sections to keep.
-        default: [typescript, python, react]
+        description: Who the explanation is for.
+        default: a 5 year old
+      medium:
+        type: enum
+        values: [html-artifact, markdown]
+        description: What the explainer is delivered as.
+        default: html-artifact
 ---
 ```
 
@@ -68,10 +68,10 @@ because it is a typo rather than content.
 ## Anchors
 
 ```markdown
-<!-- skillforge:point id=after-overview -->
+<!-- skillforge:point id=after-intro -->
 
-<!-- skillforge:block id=lang-python when='"python" in params.languages' -->
-### Python
+<!-- skillforge:block id=markdown when='params.medium == "markdown"' -->
+## The markdown
 ...
 <!-- /skillforge:block -->
 ```
@@ -98,7 +98,7 @@ a and b     a or b     (a)
 No arithmetic, no function calls, no attribute access outside `params`. Expressions are parsed,
 never `eval`'d. Referencing an undeclared param is a lint error.
 
-Use `when` for variants the skill author already knows about (a language section, a layer of the
+Use `when` for variants the skill author already knows about (a delivery medium, a layer of the
 stack). Use anchors without `when` for passages a consumer might want to rewrite. Anything else
 is the skill's substance and should not be an anchor at all.
 

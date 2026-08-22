@@ -101,8 +101,8 @@ All checks run locally, wired to git hooks. Practicalities and the accepted trad
 
 ## 13. Seed skills are vendored, and one example imports live
 
-The three shipped skills are adapted from
-[addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT) with anchors and
+The shipped `eli5` skill is adapted from
+[anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community) (Apache-2.0) with anchors and
 params added; attribution travels into rendered output. Separately, `examples/consumer/` imports
 that repository directly and patches it by hash-pinned heading path, which exercises the hardest
 path against a library nobody here controls.

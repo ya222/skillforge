@@ -14,7 +14,6 @@ generated index below is replaced wholesale each time.
 
 Read the linked file in full before acting on a skill. Load a skill when its description matches the task at hand.
 
-- [`code-simplification`](.agents/skills/code-simplification/SKILL.md) — Simplifies code for clarity. Use when refactoring code for clarity without changing behavior. Use when code works but is harder to read, maintain, or extend than it should be. Use when reviewing code that has accumulated unnecessary complexity.
-- [`frontend-ui-engineering`](.agents/skills/frontend-ui-engineering/SKILL.md) — Builds production-quality, accessible, responsive user-facing UIs. Use when building or modifying interfaces and pages, creating components, implementing layouts, meeting WCAG accessibility requirements, managing state, or when the output needs to look and feel production-quality rather than AI-generated.
-- [`perf`](.agents/skills/perf/SKILL.md) — Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load times need improvement, when N+1 query patterns need fixing, or when profiling reveals bottlenecks.
+- [`eli5`](.agents/skills/eli5/SKILL.md) — Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
+- [`eli5-upstream`](.agents/skills/eli5-upstream/SKILL.md) — Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
 <!-- skillforge:end -->

@@ -2,39 +2,31 @@
 # Regenerate with `skillforge build`.
 version: 1
 sources:
-  addy:
-    git: https://github.com/addyosmani/agent-skills.git
-    ref: main
-    commit: df1edb2e05487d0aa6d93c747141e0aed1187f25
   lib:
     git: git@github.com:ya222/skillforge.git
     ref: main
-    commit: 0b4d51a00a161bf646610b332d4c0eac67ed9533
+    commit: 5595c537b936bab3a15ecbd87ef3c5f78b7961ee
+  upstream:
+    git: https://github.com/anthropics/claude-plugins-community.git
+    ref: main
+    commit: f4c9452f5ca091f1be7064d9faab1b001ea21645
 skills:
-  code-simplification:
-    from: lib/code-simplification
+  eli5:
+    from: lib/eli5
     version: 1.0.0
-    source_hash: sha256:7bb66b4e3b1ebe721d64422c539c1c1d35500fe79a4483c4ddec934339c23e54
-  frontend-ui-engineering:
-    from: lib/frontend-ui-engineering
-    version: 1.0.0
-    source_hash: sha256:86715c42e93db08a2a180c1619ec1019ce3437a1b6a39a1e8e375a501d9b4663
-  perf:
-    from: addy/performance-optimization
+    source_hash: sha256:69d5facbeb471d5a970303db99e71e2193104699e62e5d9bad06c5fffba7951d
+  eli5-upstream:
+    from: upstream/eli5
     version: 0.0.0
-    source_hash: sha256:b14354a5fda4cdcec711dce9f9a8bd7c7288271fa0915e41ad1d2543e54ff9bd
+    source_hash: sha256:afc465704802e3532feeefb6c653aef6225d86fb7fe69a3049160ecfe9c58404
 outputs:
-  .agents/skills/code-simplification/SKILL.md: sha256:88a198e678b2afcb8d82e79d64c1ef842435e3ef07f5a54a3e411cdb70f9b9fa
-  .agents/skills/frontend-ui-engineering/SKILL.md: sha256:810277d70289628a2738911c00a8b1a6454591ba134cd3ef338292d799e39da0
-  .agents/skills/perf/SKILL.md: sha256:dc021548195583aa8fab0d1a68f185b25485e3a8e34f2044214739bb8898f45d
-  .claude/skills/code-simplification/SKILL.md: sha256:88a198e678b2afcb8d82e79d64c1ef842435e3ef07f5a54a3e411cdb70f9b9fa
-  .claude/skills/frontend-ui-engineering/SKILL.md: sha256:810277d70289628a2738911c00a8b1a6454591ba134cd3ef338292d799e39da0
-  .claude/skills/perf/SKILL.md: sha256:dc021548195583aa8fab0d1a68f185b25485e3a8e34f2044214739bb8898f45d
-  .cursor/rules/code-simplification.mdc: sha256:2379a50752a6a846e4197c8ee56c90c6def4c8eedb257f94062f570a43f9bb90
-  .cursor/rules/frontend-ui-engineering.mdc: sha256:7bf65183763e96116100e2cd2b8ce2643f1265c2f605679483664fc66b5c967d
-  .cursor/rules/perf.mdc: sha256:42a39904f2292e6f954aab19eb36f306bacdeb33fe2f8067339c03d3cffebcbc
-  .github/copilot-instructions.md#skillforge: sha256:18629e3cbb955adf5d423416d34df96ee60b4c29e7442490a7780c47b69d1245
-  .github/instructions/code-simplification.instructions.md: sha256:77643dc57375e6ba185fd3e25d3a129836b7f3256d7de23845601446df78fd86
-  .github/instructions/frontend-ui-engineering.instructions.md: sha256:a185bc1ba334b1ffd753b5f8c0036329c048bfe7e8ad9bc9f90c04c2ceda079e
-  .github/instructions/perf.instructions.md: sha256:ac7383c51e566b20e79468176aac806e125a98565ba90a737d29e001c35dfb83
-  AGENTS.md#skillforge: sha256:6f396e38be210924e73c9e66982cf463a42d04539bea550ec311973be9e2cd37
+  .agents/skills/eli5-upstream/SKILL.md: sha256:1307c8be04a81553c97a478bdb42049a690d59608868a589701cabc025236c51
+  .agents/skills/eli5/SKILL.md: sha256:dd0bc8c0ddca747279e108b4f5a3d43afbefefeeefedcb1a57ca52ff26e0eb17
+  .claude/skills/eli5-upstream/SKILL.md: sha256:1307c8be04a81553c97a478bdb42049a690d59608868a589701cabc025236c51
+  .claude/skills/eli5/SKILL.md: sha256:dd0bc8c0ddca747279e108b4f5a3d43afbefefeeefedcb1a57ca52ff26e0eb17
+  .cursor/rules/eli5-upstream.mdc: sha256:62dcfd159297e116ac96dd27e5b1c360807f26e1b5d88da15c88a3b040fa47fc
+  .cursor/rules/eli5.mdc: sha256:b08d867c1abdbf3013ba0cb762b19ba592939bc866504276f0ab25d7c3db0ba6
+  .github/copilot-instructions.md#skillforge: sha256:8e39892036786c505d577e91a42ef2c381087bb013d49fc09a471d4375674cf9
+  .github/instructions/eli5-upstream.instructions.md: sha256:b4cf54701755b329355a707a2c5d281e001103c1f46c449385263c1a4d579ea5
+  .github/instructions/eli5.instructions.md: sha256:0db5c7c5373a3baba8880484e36f9d96501fbfefeab880c331cf1df646de41b5
+  AGENTS.md#skillforge: sha256:881e450c0551ceb0fc69d10a109e2214ed321bcc09afb52c70bb861f3dbf6aaa
