@@ -27,8 +27,7 @@ files shows what the contract buys you.
 skillforge build --root examples/consumer
 ```
 
-This reaches the network and needs SSH access to the (currently private) library repository, so
-it is not part of `make ci`. The committed output is what a fresh clone gets either way.
+This reaches the network, so it is not part of `make ci`. The committed output is what a fresh clone gets either way.
 
 For a repository composed from three `extends` layers, see [`../layers/`](../layers/).
 

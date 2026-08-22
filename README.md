@@ -24,9 +24,6 @@ repo means that 90% drifts. Importing it and patching the 10% means it does not.
 
 ## Quickstart, as a consumer
 
-> This repository is currently private, so the https URLs below only work for people with
-> access. Use `git+ssh://git@github.com/ya222/skillforge` until it goes public.
-
 ```bash
 uvx --from git+https://github.com/ya222/skillforge skillforge init
 ```
@@ -89,7 +86,8 @@ params and marks the passages consumers are allowed to change. See
 | [`isometric-system-map`](skills/isometric-system-map/SKILL.md) | Draw a codebase's infrastructure as an isometric map, citing files |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
-under the Apache-2.0 licence; attribution travels with the rendered output.
+under the Apache-2.0 licence; attribution travels with the rendered output and the licence text
+is in [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt).
 
 ## Documentation
 
@@ -109,7 +107,7 @@ under the Apache-2.0 licence; attribution travels with the rendered output.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+MIT, except `skills/eli5/`, which is Apache-2.0. See [LICENSE](LICENSE).
 
 ## How it works, in five pictures
 

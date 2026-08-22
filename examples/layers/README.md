@@ -41,8 +41,7 @@ The build stops and names both layers.
 skillforge build --root examples/layers/project
 ```
 
-Reaches the network and needs SSH access to the (currently private) library, so it is not part
-of `make ci`.
+Reaches the network, so it is not part of `make ci`.
 
 For a single-layer repository that imports from two sources including one that has never heard
 of skillforge, see [`../consumer/`](../consumer/).

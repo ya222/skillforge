@@ -3,7 +3,7 @@
 version: 1
 sources:
   lib:
-    git: git@github.com:ya222/skillforge.git
+    git: https://github.com/ya222/skillforge.git
     ref: main
     commit: aba12b8d4fcc6bc0c54c09bc3dd7441ea4e88cf0
 skills:

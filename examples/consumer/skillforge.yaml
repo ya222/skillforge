@@ -10,10 +10,8 @@
 version: 1
 
 sources:
-  # ssh, because this repository is currently private. Switch to the https URL
-  # if and when it goes public.
   lib:
-    git: git@github.com:ya222/skillforge.git
+    git: https://github.com/ya222/skillforge.git
     ref: main
   upstream:
     git: https://github.com/anthropics/claude-plugins-community.git
