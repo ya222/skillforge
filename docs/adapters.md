@@ -27,6 +27,45 @@ that has not run `skillforge build`, `check` reports them as missing and fails, 
 verified, not assumed. In a shared repository, either every contributor runs `skillforge build`
 once after cloning, or keep `user: true` to a personal config outside the shared one.
 
+### Setting up a user-wide config
+
+Init from a directory you own and version, such as a dotfiles repo, not from a project:
+
+```bash
+skillforge init --root ~/dotfiles/skillforge
+```
+
+The config's root is where `skillforge.yaml`, `skillforge.lock`, the source cache and the
+canonical `.agents/skills/` copy live, so it should be somewhere you can commit and run `check`.
+Then edit the starter to:
+
+```yaml
+version: 1
+
+sources:
+  lib:
+    git: git@github.com:ya222/skillforge.git
+    ref: main
+
+skills:
+  - from: lib/eli5
+  - from: lib/eli12
+
+targets:
+  claude-code:
+    user: true
+
+output: .agents/skills
+```
+
+and run `skillforge build --root ~/dotfiles/skillforge`. Drop `agents-md` from the starter's
+targets; it would write an `AGENTS.md` into that directory that nothing reads.
+
+Two things to avoid. Putting `user: true` in a project's `skillforge.yaml` replaces that repo's
+own `.claude/skills/` output, because `targets` is keyed by adapter name, and makes every
+teammate's `check` look in their home directory. And initialising inside `~/.claude` itself
+works, but leaves a lockfile and `.agents/` next to Claude Code's own settings.
+
 ## `agents-md`
 
 | Option | Default |

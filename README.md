@@ -69,8 +69,8 @@ Claude Code, and skillforge never touches anything without that prefix.
 
 To install skills user-wide instead, so Claude Code loads them in every project on your
 machine, set `claude-code: { user: true }` under `targets:`. That writes to `~/.claude/skills/`
-alongside whatever you keep there by hand; see [docs/adapters.md](docs/adapters.md) for what
-`check` does with that scope.
+alongside whatever you keep there by hand. Init that config from a dotfiles repo, not a project;
+see [docs/adapters.md](docs/adapters.md), "Setting up a user-wide config".
 
 See [docs/consuming-skills.md](docs/consuming-skills.md) for the full configuration reference.
 
