@@ -21,6 +21,7 @@ def test_eli5_defaults_render_the_artifact_variant(repo):
     assert "anthropics/claude-plugins-community" in output
     assert "Explain like I'm a 5 year old" in output
     assert "No more than 300 words" in output
+    assert "mermaid" not in output
     assert "## The artifact" in output
     assert "## The markdown" not in output
 
@@ -38,6 +39,7 @@ def test_a_markdown_project_drops_the_artifact_section(repo):
     assert "Explain like I'm an on-call engineer" in output
     assert "No more than 120 words" in output
     assert "## The markdown" in output
+    assert "mermaid" in output
     assert "## The artifact" not in output
 
 
@@ -76,6 +78,7 @@ def test_eli12_defaults_use_the_real_name_rule_and_a_higher_word_cap(repo):
     output = rendered(repo, "eli12")
     assert "Explain like I'm a curious 12 year old" in output
     assert "No more than 1000 words" in output
+    assert "mermaid" not in output
     assert "Use the real name for things" in output
     assert "## The artifact" in output
     assert "## The markdown" not in output

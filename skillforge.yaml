@@ -5,6 +5,9 @@ version: 1
 skills:
   - from: ./skills/eli5
   - from: ./skills/eli12
+    params:
+      max_words: 1000
+      medium: markdown
 
 targets:
   claude-code: {}

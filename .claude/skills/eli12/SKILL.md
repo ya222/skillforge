@@ -22,9 +22,7 @@ Topic: $ARGUMENTS
 - Say what goes wrong when the thing is missing or broken. That is how a curious 12 year old learns why it exists.
 - End with one thing the reader can try or check themselves.
 
-## The artifact
+## The markdown
 
-Deliver a single self-contained HTML file. Inline every style and draw the pictures as inline
-SVG, so the file opens anywhere with no network. Each picture gets a caption and a short "why"
-paragraph beneath it, one per screen.
-
+Deliver plain markdown. Use mermaid for the pictures. Keep the caption and "why" paragraph
+beneath each one.

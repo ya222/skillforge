@@ -23,5 +23,4 @@ Topic: $ARGUMENTS
 
 ## The markdown
 
-Deliver plain markdown. Stand in for each picture with a fenced block describing what it would
-show, so the reader can draw it or swap in a real image later.
+Deliver plain markdown. Use mermaid for the pictures.

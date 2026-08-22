@@ -101,3 +101,67 @@ under the Apache-2.0 licence; attribution travels with the rendered output.
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
+
+## How it works, in five pictures
+
+Written with the repo's own `eli12` skill. Arrows mean "this makes that happen".
+
+```mermaid
+flowchart LR
+  S["SKILL.md"] --> A["coding agent"]
+```
+
+**A skill is a `SKILL.md` file: written instructions an agent reads before it does a job.**
+Without one, the agent guesses how your team likes things done, and guesses differently every
+time.
+
+```mermaid
+flowchart LR
+  U["skill, upstream"] -.copy.-> A["repo A: v1"]
+  U -.copy.-> B["repo B: v1 + local edits"]
+  U -.copy.-> C["repo C: v1, stale"]
+  F["fix upstream"] -.reaches nobody.-> U
+```
+
+**Copying a skill into every repo works for a week.** Then each copy drifts, and a fix upstream
+reaches nobody. This is the problem skillforge exists to remove.
+
+```mermaid
+flowchart LR
+  Y["skillforge.yaml<br/>params: max_words: 120<br/>patches: point: after-intro"] --> B["base skill<br/>{{ params.max_words }}<br/>&lt;!-- skillforge:point id=after-intro --&gt;"]
+```
+
+**A base skill leaves two kinds of gaps.** A param is a blank you fill with a value. An anchor is
+a marked spot where you may add or swap text. Your `skillforge.yaml` only touches the gaps, so
+the skill's author can change everything else without breaking you. Patch an unmarked spot and
+the build refuses, naming the anchors that do exist.
+
+```mermaid
+flowchart LR
+  B["base skill"] --> X["skillforge build"]
+  Y["skillforge.yaml"] --> X
+  X --> C[".claude/skills/"]
+  X --> M["AGENTS.md"]
+  X --> G[".github/instructions/"]
+  X --> R[".cursor/rules/"]
+```
+
+**`skillforge build` merges the two and runs adapters**: one small translator per agent, writing
+the file that agent actually reads. Every tool wants skills in a different place and format;
+without adapters you maintain four hand-written copies, which is picture two all over again. The
+output is committed, so a teammate who never installs skillforge still gets working skills.
+
+```mermaid
+flowchart LR
+  L["skillforge.lock<br/>SKILL.md: sha256:88a1…<br/>lib commit: 02a7fc4"] --> K["skillforge check"]
+  K -->|matches| OK["exit 0"]
+  K -->|hand-edited| NO["stale, exit 1"]
+```
+
+**The lockfile records a hash (a fingerprint) of every generated file and the exact upstream
+commit.** `skillforge check` rebuilds in memory and compares. If someone hand-edits a generated
+file, the next build would silently erase their change; `check` runs in the pre-commit hook, so
+the edit is caught before it lands and pushed into `skillforge.yaml` where it survives.
+
+**Try it:** open any file under `.claude/skills/`, add one word, then run `skillforge check`.
+Watch it name the file. Undo the edit and run it again.

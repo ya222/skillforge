@@ -5,12 +5,12 @@ sources:
   lib:
     git: git@github.com:ya222/skillforge.git
     ref: main
-    commit: 96f235998362c3ef4a1021c023cf2765dfca39e9
+    commit: 37c9e7f919f055a4b8f926cd192f6979cc27be7c
 skills:
   eli5:
     from: lib/eli5
     version: 1.0.0
-    source_hash: sha256:58a981f84f8ca2cfb18684f15b7a9ba8c2854dd94049dcdc5cda66988c514070
+    source_hash: sha256:7c776956ef28e3d0633444292f53677b76da10a913b3d429aea2fb7e4758d84c
 outputs:
   .agents/skills/eli5/SKILL.md: sha256:8986a61765a4fcd491b4a1796594e514faeac4044f4edda9c4278f4bd251f8ee
   .claude/skills/eli5/SKILL.md: sha256:8986a61765a4fcd491b4a1796594e514faeac4044f4edda9c4278f4bd251f8ee
