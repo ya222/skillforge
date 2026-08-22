@@ -29,8 +29,9 @@ packages = ["src/skillforge"]
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
-# The source cache holds checkouts of other people's repositories.
-extend-exclude = [".skillforge"]
+# The source cache holds checkouts of other people's repositories, and skills
+# (base and rendered) may bundle scripts that are upstream code, not ours.
+extend-exclude = [".skillforge", "skills", ".agents", ".claude", "examples"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

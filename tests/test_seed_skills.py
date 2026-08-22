@@ -91,3 +91,59 @@ def test_isometric_system_map_renders(repo):
     output = rendered(repo, "sf-isometric-system-map")
     assert "Cite files." in output
     assert "HTML artifact" in output
+
+
+def test_dev_style_renders_without_params_or_anchors(repo):
+    seeded(repo)
+    make_config(repo, skills=[{"from": "./skills/dev-style"}], targets={})
+    build_and_write(repo)
+    output = rendered(repo, "sf-dev-style")
+    assert "## Procedures" in output
+    assert "developers.google.com/style" in output
+    assert "<!-- skillforge" not in output
+
+
+def test_handoff_renders_with_its_passthrough_frontmatter(repo):
+    seeded(repo)
+    make_config(repo, skills=[{"from": "./skills/handoff"}], targets={})
+    build_and_write(repo)
+    output = rendered(repo, "sf-handoff")
+    assert "argument-hint: What will the next session be used for?" in output
+    assert "disable-model-invocation: true" in output
+    assert "## What goes in" in output
+
+
+def test_grill_me_renders_the_grilling_rounds(repo):
+    seeded(repo)
+    make_config(repo, skills=[{"from": "./skills/grill-me"}], targets={})
+    build_and_write(repo)
+    output = rendered(repo, "sf-grill-me")
+    assert "disable-model-invocation: true" in output
+    assert "**frontier**" in output
+
+
+def test_frontend_design_and_skill_creator_keep_their_bundled_files(repo):
+    seeded(repo)
+    make_config(
+        repo,
+        skills=[{"from": "./skills/frontend-design"}, {"from": "./skills/skill-creator"}],
+        targets={},
+    )
+    build_and_write(repo)
+    assert "Apache License" in (repo / ".agents/skills/sf-frontend-design/LICENSE.txt").read_text()
+    assert (repo / ".agents/skills/sf-skill-creator/scripts/run_eval.py").is_file()
+    assert (repo / ".agents/skills/sf-skill-creator/agents/grader.md").is_file()
+    assert "## Description Optimization" in rendered(repo, "sf-skill-creator")
+
+
+def test_architecture_skills_render_with_their_references(repo):
+    seeded(repo)
+    make_config(
+        repo,
+        skills=[{"from": "./skills/architecture-designer"}, {"from": "./skills/architect-review"}],
+        targets={},
+    )
+    build_and_write(repo)
+    assert (repo / ".agents/skills/sf-architecture-designer/references/adr-template.md").is_file()
+    assert "## Core Workflow" in rendered(repo, "sf-architecture-designer")
+    assert "## Response Approach" in rendered(repo, "sf-architect-review")

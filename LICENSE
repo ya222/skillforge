@@ -22,7 +22,8 @@ SOFTWARE.
 
 ---
 
-`skills/eli5/` is adapted from anthropics/claude-plugins-community, which is licensed under
-the Apache License 2.0. That licence applies to the adapted portions and is reproduced in
+`skills/eli5/` is adapted from anthropics/claude-plugins-community, and `skills/frontend-design/`
+and `skills/skill-creator/` from anthropics/skills, all of which are licensed under the Apache
+License 2.0. That licence applies to the adapted portions and is reproduced in
 LICENSES/Apache-2.0.txt. The rendered copies under `.agents/skills/sf-eli5/` and
 `.claude/skills/sf-eli5/` carry the same attribution in their frontmatter.

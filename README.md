@@ -84,10 +84,23 @@ params and marks the passages consumers are allowed to change. See
 | [`eli5`](skills/eli5/SKILL.md) | Explain a topic with big pictures and few words |
 | [`eli12`](skills/eli12/SKILL.md) | Explain a topic with real words, cause and effect, and something to try |
 | [`isometric-system-map`](skills/isometric-system-map/SKILL.md) | Draw a codebase's infrastructure as an isometric map, citing files |
+| [`dev-style`](skills/dev-style/SKILL.md) | Write developer docs in the Google developer documentation style |
+| [`handoff`](skills/handoff/SKILL.md) | Compact the conversation into a handoff document for the next agent |
+| [`grill-me`](skills/grill-me/SKILL.md) | Interview the user about a plan until nothing is silently assumed |
+| [`frontend-design`](skills/frontend-design/SKILL.md) | Distinctive, intentional visual design for new or reshaped UI |
+| [`skill-creator`](skills/skill-creator/SKILL.md) | Create, evaluate, and improve skills, with bundled eval tooling |
+| [`architecture-designer`](skills/architecture-designer/SKILL.md) | Design a system, choose patterns, write ADRs, with bundled reference guides |
+| [`architect-review`](skills/architect-review/SKILL.md) | Review a design or major change for architectural integrity |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text
-is in [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt).
+is in [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt). `dev-style` condenses the
+[Google developer documentation style guide](https://developers.google.com/style), CC BY 4.0. `handoff` and `grill-me` are
+adapted from [mattpocock/skills](https://github.com/mattpocock/skills), `architecture-designer` from
+[Jeffallan/claude-skills](https://github.com/Jeffallan/claude-skills), and `architect-review` from
+[rmyndharis/antigravity-skills](https://github.com/rmyndharis/antigravity-skills), all MIT. `frontend-design` and
+`skill-creator` are from [anthropics/skills](https://github.com/anthropics/skills), Apache-2.0, with the
+licence bundled alongside each.
 
 ## Documentation
 
@@ -107,7 +120,7 @@ is in [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt).
 
 ## Licence
 
-MIT, except `skills/eli5/`, which is Apache-2.0. See [LICENSE](LICENSE).
+MIT, except `skills/eli5/`, `skills/frontend-design/` and `skills/skill-creator/`, which are Apache-2.0. See [LICENSE](LICENSE).
 
 ## How it works, in five pictures
 

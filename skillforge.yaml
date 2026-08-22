@@ -9,6 +9,13 @@ skills:
       max_words: 1000
       medium: markdown
   - from: ./skills/isometric-system-map
+  - from: ./skills/dev-style
+  - from: ./skills/handoff
+  - from: ./skills/grill-me
+  - from: ./skills/frontend-design
+  - from: ./skills/skill-creator
+  - from: ./skills/architecture-designer
+  - from: ./skills/architect-review
 
 targets:
   claude-code: {}
