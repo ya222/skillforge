@@ -32,8 +32,10 @@ once after cloning, or keep `user: true` to a personal config outside the shared
 Init from a directory you own and version, such as a dotfiles repo, not from a project:
 
 ```bash
-skillforge init --root ~/dotfiles/skillforge
+uvx --from git+ssh://git@github.com/ya222/skillforge skillforge init --root ~/dotfiles/skillforge
 ```
+
+(`git+ssh://` because the repository is private; `uvx` cannot prompt for https credentials.)
 
 The config's root is where `skillforge.yaml`, `skillforge.lock`, the source cache and the
 canonical `.agents/skills/` copy live, so it should be somewhere you can commit and run `check`.
