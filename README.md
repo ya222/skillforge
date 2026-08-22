@@ -64,7 +64,8 @@ git add . && git commit -m "add skillforge skills"
 ```
 
 Rendered output is committed, so anyone cloning the repo gets working skills without
-installing anything. See [docs/consuming-skills.md](docs/consuming-skills.md) for the full
+installing anything. Every rendered skill is prefixed `sf-`, so `lib/eli5` is `/sf-eli5` in
+Claude Code, and skillforge never touches anything without that prefix. See [docs/consuming-skills.md](docs/consuming-skills.md) for the full
 configuration reference.
 
 ## Quickstart, as an author

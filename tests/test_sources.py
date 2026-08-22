@@ -44,7 +44,7 @@ def test_a_skill_is_imported_from_a_git_source(tmp_path):
         skills=[{"from": "up/imported"}],
     )
     result = build_and_write(consumer)
-    assert "Original." in rendered(consumer, "imported")
+    assert "Original." in rendered(consumer, "sf-imported")
     assert result.lock.sources["up"]["commit"] == commit
 
 
@@ -65,7 +65,7 @@ def test_the_lock_pins_the_commit_and_a_moved_ref_is_ignored_until_update(tmp_pa
     git(["commit", "-aqm", "second"], upstream)
 
     pinned = build_and_write(consumer)
-    assert "Original." in rendered(consumer, "imported")
+    assert "Original." in rendered(consumer, "sf-imported")
     assert pinned.lock.sources["up"]["commit"] == first.lock.sources["up"]["commit"]
 
     refreshed = build(consumer, refresh={"up"})
@@ -104,7 +104,7 @@ def test_extends_a_config_in_a_git_source(tmp_path):
         skills=[],
     )
     build_and_write(consumer)
-    assert "Original." in rendered(consumer, "imported")
+    assert "Original." in rendered(consumer, "sf-imported")
 
 
 def test_refreshing_a_source_that_does_not_exist_is_an_error(tmp_path):

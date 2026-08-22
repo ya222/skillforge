@@ -56,7 +56,9 @@ output: .agents/skills
 
 `from:` is either `<source-alias>/<skill-name>` or a path starting with `.` or `/`, resolved
 relative to the config file that declared it. Two skills rendering to the same name is an error;
-rename one with `as:`.
+rename one with `as:`. The rendered skill is always `sf-<name>` (see
+[concepts.md](concepts.md), "Output and targets"), so `lib/eli5` becomes `/sf-eli5` in Claude
+Code.
 
 ## Patches
 

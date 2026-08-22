@@ -11,9 +11,21 @@ Adapters never write to disk themselves. They append to the build plan, which is
 | Option | Default |
 | --- | --- |
 | `path` | `.claude/skills` |
+| `user` | `false` |
 
 Copies each rendered skill directory verbatim. Claude Code discovers Agent Skills natively, so
 there is nothing else to wire up.
+
+`user: true` writes to `~/.claude/skills/` instead, which Claude Code loads in every project on
+that machine. It cannot be combined with `path`. Only the `sf-` entries there are touched, so
+skills you wrote by hand alongside them are safe. `skillforge check` verifies that scope like
+any other and reports what is missing or modified; it never writes.
+
+The lockfile then records files in the home directory of whoever ran the build. On a machine
+that has not run `skillforge build`, `check` reports them as missing and fails, and so does
+`make ci` or the pre-commit hook in a repo that runs it. That is intended: the user scope is
+verified, not assumed. In a shared repository, either every contributor runs `skillforge build`
+once after cloning, or keep `user: true` to a personal config outside the shared one.
 
 ## `agents-md`
 
@@ -67,6 +79,8 @@ Writes one `<skill>.mdc` per skill with Cursor's `description`, `globs` and
 4. Add a test to `tests/test_adapters.py` asserting the harness's real file layout.
 5. Document it above.
 
-Append `FileWrite` for files skillforge fully owns, and `RegionWrite` for a managed region in a
-file a human also edits. Add any directory you fully own to `plan.managed_dirs` so stale files
-are pruned when a skill is removed.
+Append `FileWrite` for files skillforge owns, and `RegionWrite` for a managed region in a file
+a human also edits. Name every file after the rendered skill, so it carries the `sf-` prefix,
+and add its directory to `plan.managed_dirs`: pruning only ever removes `sf-` entries that the
+current build did not produce, so a directory is safe to manage even when it also holds
+hand-written files.

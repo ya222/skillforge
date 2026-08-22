@@ -1,6 +1,6 @@
 ---
-name: eli12
-description: Explain a topic like I'm a 12 year old. Use when the user types /eli12 <topic> or asks for an explainer that uses real words but assumes no background, with pictures that show cause and effect.
+name: sf-eli12
+description: Explain a topic like I'm a 12 year old. Use when the user types /sf-eli12 <topic> or asks for an explainer that uses real words but assumes no background, with pictures that show cause and effect.
 metadata:
   skillforge:
     version: 1.0.0

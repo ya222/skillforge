@@ -75,7 +75,7 @@ regenerated files in the same commit.
 
 Read the linked file in full before acting on a skill. Load a skill when its description matches the task at hand.
 
-- [`eli12`](.agents/skills/eli12/SKILL.md) — Explain a topic like I'm a 12 year old. Use when the user types /eli12 <topic> or asks for an explainer that uses real words but assumes no background, with pictures that show cause and effect.
-- [`eli5`](.agents/skills/eli5/SKILL.md) — Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
-- [`isometric-system-map`](.agents/skills/isometric-system-map/SKILL.md) — Draws an isometric system map of a codebase's infrastructure, with legend and explainer panel. Use when the user types /isometric-system-map or asks for a visual map of how the system's parts connect.
+- [`sf-eli12`](.agents/skills/sf-eli12/SKILL.md) — Explain a topic like I'm a 12 year old. Use when the user types /sf-eli12 <topic> or asks for an explainer that uses real words but assumes no background, with pictures that show cause and effect.
+- [`sf-eli5`](.agents/skills/sf-eli5/SKILL.md) — Explain a topic like I'm a 5 year old. Use when the user types /sf-eli5 <topic> or asks for a dead-simple picture explainer of how something works.
+- [`sf-isometric-system-map`](.agents/skills/sf-isometric-system-map/SKILL.md) — Draws an isometric system map of a codebase's infrastructure, with legend and explainer panel. Use when the user types /sf-isometric-system-map or asks for a visual map of how the system's parts connect.
 <!-- skillforge:end -->

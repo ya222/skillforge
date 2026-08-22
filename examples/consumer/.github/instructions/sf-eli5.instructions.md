@@ -1,11 +1,6 @@
 ---
-name: eli5
-description: Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
-metadata:
-  skillforge:
-    version: 1.0.0
-    source: lib/eli5
-    attribution: Adapted from anthropics/claude-plugins-community (Apache-2.0), eli5/skills/eli5 at f4c9452f5ca0.
+applyTo: '**'
+description: Explain a topic like I'm a 5 year old. Use when the user types /sf-eli5 <topic> or asks for a dead-simple picture explainer of how something works.
 ---
 
 # eli5

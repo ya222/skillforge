@@ -17,7 +17,7 @@ def test_eli5_defaults_render_the_artifact_variant(repo):
     seeded(repo)
     make_config(repo, skills=[{"from": "./skills/eli5"}], targets={})
     build_and_write(repo)
-    output = rendered(repo, "eli5")
+    output = rendered(repo, "sf-eli5")
     assert "anthropics/claude-plugins-community" in output
     assert "Explain like I'm a 5 year old" in output
     assert "No more than 300 words" in output
@@ -35,7 +35,7 @@ def test_a_markdown_project_drops_the_artifact_section(repo):
         targets={},
     )
     build_and_write(repo)
-    output = rendered(repo, "eli5")
+    output = rendered(repo, "sf-eli5")
     assert "Explain like I'm an on-call engineer" in output
     assert "No more than 120 words" in output
     assert "## The markdown" in output
@@ -63,7 +63,7 @@ def test_a_consumer_can_extend_a_shipped_skill_through_its_anchors(repo):
         targets={},
     )
     build_and_write(repo)
-    output = rendered(repo, "eli5")
+    output = rendered(repo, "sf-eli5")
     assert "> Name the real service, never a stand-in." in output
     assert output.index("Topic: $ARGUMENTS") < output.index("> Name the real service")
     assert output.index("> Name the real service") < output.index("## Rules")
@@ -75,7 +75,7 @@ def test_eli12_defaults_use_the_real_name_rule_and_a_higher_word_cap(repo):
     seeded(repo)
     make_config(repo, skills=[{"from": "./skills/eli12"}], targets={})
     build_and_write(repo)
-    output = rendered(repo, "eli12")
+    output = rendered(repo, "sf-eli12")
     assert "Explain like I'm a curious 12 year old" in output
     assert "No more than 1000 words" in output
     assert "mermaid" not in output
@@ -88,6 +88,6 @@ def test_isometric_system_map_renders(repo):
     seeded(repo)
     make_config(repo, skills=[{"from": "./skills/isometric-system-map"}], targets={})
     build_and_write(repo)
-    output = rendered(repo, "isometric-system-map")
+    output = rendered(repo, "sf-isometric-system-map")
     assert "Cite files." in output
     assert "HTML artifact" in output

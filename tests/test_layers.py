@@ -37,7 +37,7 @@ def test_extends_pulls_skills_and_params_from_a_parent_layer(repo):
     )
     make_config(repo, extends=["./org"], skills=[])
     build_and_write(repo)
-    assert "- Base rule." in rendered(repo, "demo")
+    assert "- Base rule." in rendered(repo, "sf-demo")
 
 
 def test_a_later_layer_overrides_a_param(repo):
@@ -53,7 +53,7 @@ def test_a_later_layer_overrides_a_param(repo):
     )
     make_config(repo, extends=["./org"], shared_params={"owner": "project-x"}, skills=[])
     build_and_write(repo)
-    assert "Owner: project-x" in rendered(repo, "demo")
+    assert "Owner: project-x" in rendered(repo, "sf-demo")
 
 
 def test_two_layers_patching_one_anchor_is_an_error(repo):
@@ -116,7 +116,7 @@ def test_force_lets_the_later_layer_win(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "- Project rule." in output
     assert "- Org rule." not in output
 
@@ -136,7 +136,7 @@ def test_two_patches_in_one_layer_both_apply(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "- One." in output and "- Two." in output
 
 
@@ -173,9 +173,9 @@ def test_targets_and_output_survive_two_levels_of_extends(repo):
     # override the org layer and hide what this test is about.
     make_layer(repo, ".", {"extends": ["./team"], "skills": []})
     build_and_write(repo)
-    assert (repo / "rendered/skills/demo/SKILL.md").is_file()
-    assert (repo / ".claude/skills/demo/SKILL.md").is_file()
-    assert (repo / ".cursor/rules/demo.mdc").is_file()
+    assert (repo / "rendered/skills/sf-demo/SKILL.md").is_file()
+    assert (repo / ".claude/skills/sf-demo/SKILL.md").is_file()
+    assert (repo / ".cursor/rules/sf-demo.mdc").is_file()
 
 
 def test_a_diamond_of_layers_is_not_a_cycle(repo):
@@ -197,7 +197,7 @@ def test_a_diamond_of_layers_is_not_a_cycle(repo):
     make_layer(repo, "teamB", {"extends": ["../org"]})
     make_config(repo, extends=["./teamA", "./teamB"], skills=[])
     build_and_write(repo)
-    assert rendered(repo, "demo").count("- Org rule.") == 1
+    assert rendered(repo, "sf-demo").count("- Org rule.") == 1
 
 
 def test_a_real_cycle_names_the_chain(repo):

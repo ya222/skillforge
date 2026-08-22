@@ -48,7 +48,7 @@ def test_replace_a_block(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "- House rule." in output
     assert "- Original rule." not in output
 
@@ -68,7 +68,7 @@ def test_append_and_prepend_a_block(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert output.index("- Prepended rule.") < output.index("- Original rule.")
     assert output.index("- Original rule.") < output.index("- Appended rule.")
 
@@ -80,7 +80,7 @@ def test_remove_a_block(repo):
         skills=[{"from": "./skills/demo", "patches": [{"block": "rules", "op": "remove"}]}],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "## Rules" not in output
     assert "## Verification" in output
 
@@ -99,7 +99,7 @@ def test_insert_at_a_point(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert output.index("Original overview.") < output.index("House context here.")
     assert output.index("House context here.") < output.index("## Rules")
 
@@ -149,7 +149,7 @@ def test_heading_patch_applies_when_the_hash_matches(repo):
         ],
     )
     build_and_write(repo)
-    assert "- [ ] Extra check." in rendered(repo, "demo")
+    assert "- [ ] Extra check." in rendered(repo, "sf-demo")
 
 
 def test_heading_patch_fails_loudly_when_upstream_moved(repo):
@@ -211,7 +211,7 @@ def test_headings_inside_code_fences_are_not_targets(repo):
         ],
     )
     build_and_write(repo)
-    assert "Tail." in rendered(repo, "demo")
+    assert "Tail." in rendered(repo, "sf-demo")
 
 
 def test_add_and_remove_files(repo):
@@ -231,7 +231,7 @@ def test_add_and_remove_files(repo):
         ],
     )
     build_and_write(repo)
-    output = repo / ".agents/skills/demo/references"
+    output = repo / ".agents/skills/sf-demo/references"
     assert not (output / "old.md").exists()
     assert (output / "new.md").read_text() == "new\n"
 
@@ -254,7 +254,7 @@ def test_set_frontmatter(repo):
         ],
     )
     build_and_write(repo)
-    assert "description: Rewritten. Use when testing." in rendered(repo, "demo")
+    assert "description: Rewritten. Use when testing." in rendered(repo, "sf-demo")
 
 
 def test_a_heading_after_a_deeper_one_is_not_nested_under_it(repo):
@@ -279,7 +279,7 @@ def test_a_heading_after_a_deeper_one_is_not_nested_under_it(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert output.index("more") < output.index("Tail.")
 
     with pytest.raises(PatchError, match="not found"):
@@ -377,5 +377,5 @@ def test_two_inserts_at_one_point_both_apply(repo):
         ],
     )
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "First." in output and "Second." in output

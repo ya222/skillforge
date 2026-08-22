@@ -5,13 +5,13 @@ sources:
   lib:
     git: git@github.com:ya222/skillforge.git
     ref: main
-    commit: 7a1a3310205ffbdf3c80ec06f95492670446b1c2
+    commit: aba12b8d4fcc6bc0c54c09bc3dd7441ea4e88cf0
 skills:
-  eli5:
+  sf-eli5:
     from: lib/eli5
     version: 1.0.0
-    source_hash: sha256:7c776956ef28e3d0633444292f53677b76da10a913b3d429aea2fb7e4758d84c
+    source_hash: sha256:9f53f517c8c0633b425f037e59444ecc0cdb3c4f0176917b092232814deda831
 outputs:
-  .agents/skills/eli5/SKILL.md: sha256:8986a61765a4fcd491b4a1796594e514faeac4044f4edda9c4278f4bd251f8ee
-  .claude/skills/eli5/SKILL.md: sha256:8986a61765a4fcd491b4a1796594e514faeac4044f4edda9c4278f4bd251f8ee
-  AGENTS.md#skillforge: sha256:523ff7f47b4e8b2326a09d09d8b0bd97f9d75b97c1cca754940338715b3540f9
+  .agents/skills/sf-eli5/SKILL.md: sha256:0db5275f14e6dd70e1d0df32a9f6fae8ed557e549c02971869ce878bbdb8dc11
+  .claude/skills/sf-eli5/SKILL.md: sha256:0db5275f14e6dd70e1d0df32a9f6fae8ed557e549c02971869ce878bbdb8dc11
+  AGENTS.md#skillforge: sha256:bbdb2a279282e71472049bec62430f9d29d3a2250df23b43a08eccf8d8de4653

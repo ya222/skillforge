@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from skillforge.errors import DriftError
+from skillforge.model import RENDERED_PREFIX
 
 REGION_BEGIN = "<!-- skillforge:begin -->"
 REGION_END = "<!-- skillforge:end -->"
@@ -85,30 +86,53 @@ def extract_region(existing: str, path: str) -> str:
     return existing[start + len(REGION_BEGIN) : end].strip("\n")
 
 
+def resolve(root: Path, path: str) -> Path:
+    """A plan path on disk. Relative to the repo root, unless it is absolute or starts with `~`."""
+    expanded = Path(path).expanduser()
+    return expanded if expanded.is_absolute() else root / expanded
+
+
+def owned(root: Path, directory: str) -> list[Path]:
+    """Files under a managed directory that skillforge owns: those in an `sf-` entry.
+
+    Anything else in the directory, such as a hand-written skill, is never touched.
+    """
+    target = resolve(root, directory)
+    if not target.is_dir():
+        return []
+    found: list[Path] = []
+    for entry in target.iterdir():
+        if not entry.name.startswith(RENDERED_PREFIX):
+            continue
+        if entry.is_dir():
+            found.extend(p for p in entry.rglob("*") if p.is_file())
+        else:
+            found.append(entry)
+    return found
+
+
 def apply(plan: Plan, root: Path) -> list[str]:
-    """Write the plan to disk, pruning anything stale under fully managed directories."""
+    """Write the plan to disk, pruning stale `sf-` entries under managed directories."""
     written: list[str] = []
-    planned = {f.path for f in plan.files}
+    planned = {resolve(root, f.path) for f in plan.files}
 
     for directory in plan.managed_dirs:
-        target = root / directory
-        if not target.is_dir():
-            continue
-        for existing in sorted(target.rglob("*"), reverse=True):
-            relative = existing.relative_to(root).as_posix()
-            if existing.is_file() and relative not in planned:
+        for existing in sorted(owned(root, directory), reverse=True):
+            if existing not in planned:
                 existing.unlink()
-            elif existing.is_dir() and not any(existing.iterdir()):
-                existing.rmdir()
+                parent = existing.parent
+                while parent != resolve(root, directory) and not any(parent.iterdir()):
+                    parent.rmdir()
+                    parent = parent.parent
 
     for entry in plan.files:
-        path = root / entry.path
+        path = resolve(root, entry.path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(entry.content)
         written.append(entry.path)
 
     for region in plan.regions:
-        path = root / region.path
+        path = resolve(root, region.path)
         path.parent.mkdir(parents=True, exist_ok=True)
         existing = path.read_text(encoding="utf-8") if path.is_file() else None
         path.write_text(render_region(existing, region.content, region.path), encoding="utf-8")
@@ -119,17 +143,17 @@ def apply(plan: Plan, root: Path) -> list[str]:
 def diff(plan: Plan, root: Path) -> list[str]:
     """Everything about the working tree that does not match the plan."""
     problems: list[str] = []
-    planned = {f.path for f in plan.files}
+    planned = {resolve(root, f.path) for f in plan.files}
 
     for entry in plan.files:
-        path = root / entry.path
+        path = resolve(root, entry.path)
         if not path.is_file():
             problems.append(f"missing: {entry.path}")
         elif path.read_bytes() != entry.content:
             problems.append(f"modified: {entry.path}")
 
     for region in plan.regions:
-        path = root / region.path
+        path = resolve(root, region.path)
         if not path.is_file():
             problems.append(f"missing: {region.path}")
             continue
@@ -138,11 +162,8 @@ def diff(plan: Plan, root: Path) -> list[str]:
             problems.append(f"modified: {region.key}")
 
     for directory in plan.managed_dirs:
-        target = root / directory
-        if not target.is_dir():
-            continue
-        for existing in target.rglob("*"):
-            relative = existing.relative_to(root).as_posix()
-            if existing.is_file() and relative not in planned:
-                problems.append(f"stale: {relative}")
+        base = resolve(root, directory)
+        for existing in owned(root, directory):
+            if existing not in planned:
+                problems.append(f"stale: {directory}/{existing.relative_to(base).as_posix()}")
     return sorted(problems)

@@ -43,7 +43,7 @@ def test_defaults_render_every_block(repo):
     make_skill(repo, params=PARAMS, body=LANG_BODY)
     make_config(repo, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "Run pytest before you finish." in output
     assert "## Python" in output
     assert "## TypeScript" in output
@@ -54,7 +54,7 @@ def test_when_drops_a_block_and_leaves_no_scar(repo):
     make_skill(repo, params=PARAMS, body=LANG_BODY)
     make_config(repo, shared_params={"languages": ["python"]}, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
-    output = rendered(repo, "demo")
+    output = rendered(repo, "sf-demo")
     assert "## Python" in output
     assert "## TypeScript" not in output
     assert "\n\n\n" not in output
@@ -68,14 +68,14 @@ def test_per_skill_params_beat_repo_wide_params(repo):
         skills=[{"from": "./skills/demo", "params": {"test_command": "cargo test"}}],
     )
     build_and_write(repo)
-    assert "Run cargo test before" in rendered(repo, "demo")
+    assert "Run cargo test before" in rendered(repo, "sf-demo")
 
 
 def test_shared_param_a_skill_does_not_declare_is_ignored(repo):
     make_skill(repo, params=PARAMS, body=LANG_BODY)
     make_config(repo, shared_params={"unrelated": "value"}, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
-    assert "Run pytest" in rendered(repo, "demo")
+    assert "Run pytest" in rendered(repo, "sf-demo")
 
 
 def test_undeclared_per_skill_param_is_an_error(repo):
@@ -110,7 +110,7 @@ def test_required_param_supplied_as_shared(repo):
     make_skill(repo, params={"owner": {"type": "string"}}, body="Owned by {{ params.owner }}.\n")
     make_config(repo, shared_params={"owner": "platform"}, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
-    assert "Owned by platform." in rendered(repo, "demo")
+    assert "Owned by platform." in rendered(repo, "sf-demo")
 
 
 def test_unknown_placeholder_that_claims_to_be_a_param_is_an_error(repo):
@@ -124,7 +124,7 @@ def test_unrelated_braces_pass_through_untouched(repo):
     make_skill(repo, body="Example: {{ sortBy: 'date' }} stays as written.\n")
     make_config(repo, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
-    assert "{{ sortBy: 'date' }}" in rendered(repo, "demo")
+    assert "{{ sortBy: 'date' }}" in rendered(repo, "sf-demo")
 
 
 def test_when_referencing_an_undeclared_param_is_an_error(repo):
@@ -157,7 +157,7 @@ def test_as_renames_the_rendered_skill(repo):
     make_skill(repo, body="Body.\n")
     make_config(repo, skills=[{"from": "./skills/demo", "as": "renamed"}])
     build_and_write(repo)
-    assert "name: renamed" in rendered(repo, "renamed")
+    assert "name: sf-renamed" in rendered(repo, "sf-renamed")
 
 
 def test_a_plain_agent_skill_without_skillforge_metadata_renders(repo):
@@ -169,7 +169,7 @@ def test_a_plain_agent_skill_without_skillforge_metadata_renders(repo):
     )
     make_config(repo, skills=[{"from": "./skills/plain"}])
     build_and_write(repo)
-    output = rendered(repo, "plain")
+    output = rendered(repo, "sf-plain")
     assert "Be careful." in output
     assert "version: 0.0.0" in output
 
@@ -182,7 +182,7 @@ def test_a_bundled_file_named_skill_md_is_not_dropped(repo):
     )
     make_config(repo, skills=[{"from": "./skills/demo"}], targets={})
     build_and_write(repo)
-    assert (repo / ".agents/skills/demo/references/SKILL.md").is_file()
+    assert (repo / ".agents/skills/sf-demo/references/SKILL.md").is_file()
 
 
 def test_a_text_file_that_is_not_utf8_fails_with_a_named_error(repo):

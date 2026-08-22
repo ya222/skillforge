@@ -12,6 +12,11 @@ from skillforge.errors import ConfigError, SkillError
 MISSING = object()
 
 SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+# Every rendered skill is named `sf-<name>`, and skillforge only ever creates,
+# rewrites or prunes entries carrying this prefix. A managed directory can
+# therefore be shared with hand-written skills, including a user's ~/.claude/skills.
+RENDERED_PREFIX = "sf-"
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 PARAM_TYPES = ("string", "bool", "int", "list", "enum")

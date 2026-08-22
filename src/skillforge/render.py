@@ -12,7 +12,7 @@ from skillforge import lock as lock_module
 from skillforge import sources as sources_module
 from skillforge.adapters import ADAPTERS
 from skillforge.errors import ConfigError, SkillError
-from skillforge.model import Config, SkillMeta, SkillRequest
+from skillforge.model import RENDERED_PREFIX, Config, SkillMeta, SkillRequest
 from skillforge.params import resolve as resolve_params
 from skillforge.params import substitute
 from skillforge.patch import apply_patches
@@ -166,7 +166,8 @@ def render_skill(
     for relative, content in patched.added_files.items():
         files[relative] = substitute(content, params, f"{origin} file `{relative}`").encode()
 
-    frontmatter = {"name": request.name, "description": description}
+    rendered_name = f"{RENDERED_PREFIX}{request.name}"
+    frontmatter = {"name": rendered_name, "description": description}
     for key, value in patched.frontmatter.items():
         if key not in ("name", "description", "metadata"):
             frontmatter[key] = value
@@ -176,7 +177,7 @@ def render_skill(
     frontmatter["metadata"] = {"skillforge": provenance}
 
     return RenderedSkill(
-        name=request.name,
+        name=rendered_name,
         description=description,
         frontmatter=frontmatter,
         body=body,

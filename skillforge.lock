@@ -3,23 +3,23 @@
 version: 1
 sources: {}
 skills:
-  eli12:
+  sf-eli12:
     from: ./skills/eli12
     version: 1.0.0
-    source_hash: sha256:d424b5c51849921ace1464f6583fc40655267a715896dece9fbbe020eb7eb788
-  eli5:
+    source_hash: sha256:2683e6b708a2062da2421570b22577fad48f56ad71db0e2bb6734b724f5b553d
+  sf-eli5:
     from: ./skills/eli5
     version: 1.0.0
-    source_hash: sha256:7c776956ef28e3d0633444292f53677b76da10a913b3d429aea2fb7e4758d84c
-  isometric-system-map:
+    source_hash: sha256:9f53f517c8c0633b425f037e59444ecc0cdb3c4f0176917b092232814deda831
+  sf-isometric-system-map:
     from: ./skills/isometric-system-map
     version: 1.0.0
-    source_hash: sha256:25e90384321391259993d4c02abd6b430be4ab9dc469e53959025577904d8d39
+    source_hash: sha256:f3a849a373afbdc2d2a42d634609ec56519dbf99ec2cee5a9cc4947fedf5bdd4
 outputs:
-  .agents/skills/eli12/SKILL.md: sha256:05264eee94ca6d1c760d1f02130c5883bf5ddc8af789c80ce442da46e95e2a26
-  .agents/skills/eli5/SKILL.md: sha256:ed443fd8cfa1577cd815c2df9b92e0bb2f4faac7e90c90741138a1baf511cb6d
-  .agents/skills/isometric-system-map/SKILL.md: sha256:2aa0bf62af81b919ed2bf55eda69179205eb8cb131dd5be8e8eedbdcfe176d99
-  .claude/skills/eli12/SKILL.md: sha256:05264eee94ca6d1c760d1f02130c5883bf5ddc8af789c80ce442da46e95e2a26
-  .claude/skills/eli5/SKILL.md: sha256:ed443fd8cfa1577cd815c2df9b92e0bb2f4faac7e90c90741138a1baf511cb6d
-  .claude/skills/isometric-system-map/SKILL.md: sha256:2aa0bf62af81b919ed2bf55eda69179205eb8cb131dd5be8e8eedbdcfe176d99
-  AGENTS.md#skillforge: sha256:82b7ba5f37e55e876ee6235eb83e3c152f1973bb4aea3d71f34ca05e5b36b519
+  .agents/skills/sf-eli12/SKILL.md: sha256:29701d00a75c056f3467f368957e79d1cf287828b5425a29a0bc625205ef0dc2
+  .agents/skills/sf-eli5/SKILL.md: sha256:ede6aa581d50ee396f0ed2f680ba5a5e25378670ba5df886de688dcd4287e1f7
+  .agents/skills/sf-isometric-system-map/SKILL.md: sha256:80f890b0b98df818bad949b0e679f28be7ee386ebb879ec5d74953397e179d08
+  .claude/skills/sf-eli12/SKILL.md: sha256:29701d00a75c056f3467f368957e79d1cf287828b5425a29a0bc625205ef0dc2
+  .claude/skills/sf-eli5/SKILL.md: sha256:ede6aa581d50ee396f0ed2f680ba5a5e25378670ba5df886de688dcd4287e1f7
+  .claude/skills/sf-isometric-system-map/SKILL.md: sha256:80f890b0b98df818bad949b0e679f28be7ee386ebb879ec5d74953397e179d08
+  AGENTS.md#skillforge: sha256:31f912a5b6b2e7d90c57a8342bc1981b857cabf3a5c74791593d4c5ed1e1043d

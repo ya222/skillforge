@@ -125,3 +125,13 @@ create" and "the file to read content from". `file:` names the destination for `
 Skill bodies legitimately contain `{{ … }}` in code examples. A placeholder that starts with
 `param` or `params` must be a well-formed `{{ params.<name> }}`; anything else passes through
 verbatim. This keeps typo detection where it matters without fighting real content.
+
+## 17. Rendered skills are prefixed `sf-`, and the prefix is the ownership rule
+
+Every rendered skill is `sf-<name>`: directory, frontmatter `name`, slash command. In any
+directory skillforge writes to, it creates, rewrites and prunes only `sf-` entries. The earlier
+rule, "a managed directory is fully owned, prune anything not in the plan", was fine for
+`.claude/skills/` inside a repo and fatal for `~/.claude/skills/`, where it would have deleted
+every skill a user wrote by hand. Naming what we own is simpler than tracking it, survives a
+lost lockfile, and makes the user scope (`claude-code: {user: true}`) safe by construction.
+`check` verifies that scope like any other and only ever reports.

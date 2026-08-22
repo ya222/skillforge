@@ -72,6 +72,12 @@ anything from the earlier patch that should survive has to be restated. Two patc
 The build renders every configured skill into `output:` (default `.agents/skills/`). That
 directory is the canonical artifact and is committed.
 
+Every rendered skill is named `sf-<name>`: the directory, the `name` in its frontmatter, and
+so the slash command a harness exposes. The prefix is how skillforge knows what it owns. In any
+directory it writes to, it creates, rewrites and prunes only `sf-` entries and never touches
+anything else, so a generated directory can be shared with hand-written skills, including a
+user's `~/.claude/skills/`.
+
 Adapters then translate it into whatever each harness reads. Adapters are the only part of
 skillforge that knows a harness exists. See [adapters.md](adapters.md).
 

@@ -71,7 +71,7 @@ def test_eject_copies_the_skill_local_and_repoints_the_config(tmp_path):
     assert "patches" not in entry
 
     build_and_write(consumer)
-    assert "Original." in rendered(consumer, "imported")
+    assert "Original." in rendered(consumer, "sf-imported")
 
 
 def test_eject_refuses_a_skill_that_is_already_local(repo):
