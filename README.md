@@ -77,8 +77,9 @@ params and marks the passages consumers are allowed to change. See
 | Skill | What it does |
 | --- | --- |
 | [`eli5`](skills/eli5/SKILL.md) | Explain a topic with big pictures and few words |
+| [`eli12`](skills/eli12/SKILL.md) | Explain a topic with real words, cause and effect, and something to try |
 
-Adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
+`eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output.
 
 ## Documentation

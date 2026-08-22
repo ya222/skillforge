@@ -20,7 +20,7 @@ metadata:
       max_words:
         type: int
         description: Hard ceiling on the word count of the whole explainer.
-        default: 200
+        default: 300
 ---
 
 # eli5

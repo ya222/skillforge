@@ -75,5 +75,6 @@ regenerated files in the same commit.
 
 Read the linked file in full before acting on a skill. Load a skill when its description matches the task at hand.
 
+- [`eli12`](.agents/skills/eli12/SKILL.md) — Explain a topic like I'm a 12 year old. Use when the user types /eli12 <topic> or asks for an explainer that uses real words but assumes no background, with pictures that show cause and effect.
 - [`eli5`](.agents/skills/eli5/SKILL.md) — Explain a topic like I'm a 5 year old. Use when the user types /eli5 <topic> or asks for a dead-simple picture explainer of how something works.
 <!-- skillforge:end -->

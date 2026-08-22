@@ -18,7 +18,7 @@ Topic: $ARGUMENTS
 ## Rules
 
 - One idea per picture. If a picture needs a paragraph, it is two pictures.
-- No more than 200 words in total, captions included.
+- No more than 300 words in total, captions included.
 - Every word a 5 year old would not already know gets an everyday analogy, not a definition.
 - End with the one sentence the reader should be able to repeat afterwards.
 

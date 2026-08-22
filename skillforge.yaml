@@ -4,6 +4,7 @@ version: 1
 
 skills:
   - from: ./skills/eli5
+  - from: ./skills/eli12
 
 targets:
   claude-code: {}

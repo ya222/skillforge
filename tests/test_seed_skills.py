@@ -20,7 +20,7 @@ def test_eli5_defaults_render_the_artifact_variant(repo):
     output = rendered(repo, "eli5")
     assert "anthropics/claude-plugins-community" in output
     assert "Explain like I'm a 5 year old" in output
-    assert "No more than 200 words" in output
+    assert "No more than 300 words" in output
     assert "## The artifact" in output
     assert "## The markdown" not in output
 
@@ -67,3 +67,15 @@ def test_a_consumer_can_extend_a_shipped_skill_through_its_anchors(repo):
     assert output.index("> Name the real service") < output.index("## Rules")
     assert "- Link the runbook" in output
     assert "<!-- skillforge" not in output
+
+
+def test_eli12_defaults_use_the_real_name_rule_and_a_higher_word_cap(repo):
+    seeded(repo)
+    make_config(repo, skills=[{"from": "./skills/eli12"}], targets={})
+    build_and_write(repo)
+    output = rendered(repo, "eli12")
+    assert "Explain like I'm a curious 12 year old" in output
+    assert "No more than 1000 words" in output
+    assert "Use the real name for things" in output
+    assert "## The artifact" in output
+    assert "## The markdown" not in output

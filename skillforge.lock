@@ -3,11 +3,17 @@
 version: 1
 sources: {}
 skills:
+  eli12:
+    from: ./skills/eli12
+    version: 1.0.0
+    source_hash: sha256:f176fa610dbf7ee118ae257a5dbc7c73eac031061694f24dd2fee6234531ec0c
   eli5:
     from: ./skills/eli5
     version: 1.0.0
-    source_hash: sha256:69d5facbeb471d5a970303db99e71e2193104699e62e5d9bad06c5fffba7951d
+    source_hash: sha256:58a981f84f8ca2cfb18684f15b7a9ba8c2854dd94049dcdc5cda66988c514070
 outputs:
-  .agents/skills/eli5/SKILL.md: sha256:c263c94f8f62502ffe40b20babceb945208abffafbe6992f52d3c0206a36bd43
-  .claude/skills/eli5/SKILL.md: sha256:c263c94f8f62502ffe40b20babceb945208abffafbe6992f52d3c0206a36bd43
-  AGENTS.md#skillforge: sha256:523ff7f47b4e8b2326a09d09d8b0bd97f9d75b97c1cca754940338715b3540f9
+  .agents/skills/eli12/SKILL.md: sha256:c37c041bf5476c5e1244292f8baac6098cacd2fee529591b5ce5bc0f713af6e0
+  .agents/skills/eli5/SKILL.md: sha256:ed443fd8cfa1577cd815c2df9b92e0bb2f4faac7e90c90741138a1baf511cb6d
+  .claude/skills/eli12/SKILL.md: sha256:c37c041bf5476c5e1244292f8baac6098cacd2fee529591b5ce5bc0f713af6e0
+  .claude/skills/eli5/SKILL.md: sha256:ed443fd8cfa1577cd815c2df9b92e0bb2f4faac7e90c90741138a1baf511cb6d
+  AGENTS.md#skillforge: sha256:d0c715eab4e14dc9d79e9c013789f4fdea5ccf3e0247d5555f302aa503b884fb
