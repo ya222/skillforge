@@ -28,6 +28,12 @@ def test_init_writes_a_starter_config(repo):
     assert config_of(repo)["version"] == 1
 
 
+def test_init_creates_the_root_directory(repo):
+    target = repo / "dotfiles" / "skillforge"
+    run("init", "--root", str(target))
+    assert config_of(target)["version"] == 1
+
+
 def test_init_refuses_to_clobber(repo):
     run("init", "--root", str(repo))
     with pytest.raises(Exception, match="already exists"):

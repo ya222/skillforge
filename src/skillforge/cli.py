@@ -50,6 +50,7 @@ def init(root: str | None) -> None:
     target = _root(root) / config_module.CONFIG_NAME
     if target.exists():
         raise ConfigError(f"{target} already exists")
+    target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(STARTER, encoding="utf-8")
     click.echo(f"wrote {target}")
 
