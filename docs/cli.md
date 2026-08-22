@@ -13,7 +13,7 @@ failure exits non-zero with a message naming the file, the skill and the target 
 
 | Command | Does |
 | --- | --- |
-| `init` | Writes a starter `skillforge.yaml`. Fails if one exists |
+| `init [--no-edit]` | Writes a starter `skillforge.yaml` and opens it in `$VISUAL`/`$EDITOR`. Creates the root if needed. Fails if one exists |
 | `add <ref> [--as NAME]` | Appends a skill entry to `skillforge.yaml` |
 | `build` | Renders every configured skill, writes the outputs, rewrites `skillforge.lock` |
 | `check` | Fails if committed output or the lockfile is stale. Changes nothing |

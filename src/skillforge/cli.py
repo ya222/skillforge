@@ -45,14 +45,17 @@ def main() -> None:
 
 @main.command()
 @click.option("--root", default=None, help="Repository root (defaults to the current directory).")
-def init(root: str | None) -> None:
-    """Write a starter skillforge.yaml."""
+@click.option("--no-edit", is_flag=True, help="Write the starter without opening it in $EDITOR.")
+def init(root: str | None, no_edit: bool) -> None:
+    """Write a starter skillforge.yaml and open it in your editor."""
     target = _root(root) / config_module.CONFIG_NAME
     if target.exists():
         raise ConfigError(f"{target} already exists")
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(STARTER, encoding="utf-8")
     click.echo(f"wrote {target}")
+    if not no_edit and sys.stdin.isatty():
+        click.edit(filename=str(target))
 
 
 @main.command(name="build")

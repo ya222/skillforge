@@ -39,7 +39,7 @@ uvx --from git+ssh://git@github.com/ya222/skillforge skillforge init --root ~/do
 
 The config's root is where `skillforge.yaml`, `skillforge.lock`, the source cache and the
 canonical `.agents/skills/` copy live, so it should be somewhere you can commit and run `check`.
-Then edit the starter to:
+`init` opens the starter in your editor; fill it in as:
 
 ```yaml
 version: 1

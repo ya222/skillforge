@@ -31,7 +31,7 @@ repo means that 90% drifts. Importing it and patching the 10% means it does not.
 uvx --from git+https://github.com/ya222/skillforge skillforge init
 ```
 
-Then edit `skillforge.yaml`:
+It opens the new `skillforge.yaml` in your editor. Fill it in:
 
 ```yaml
 version: 1
