@@ -11,9 +11,9 @@ the repo uses.
 ```
 skills/<name>/SKILL.md          the base skill, plain and directly usable
         ↓  params, anchors, patches from skillforge.yaml
-.agents/skills/<name>/          the rendered artifact, committed
+.agents/skills/sf-<name>/       the rendered artifact, committed
         ↓  adapters
-.claude/skills/  AGENTS.md  .github/instructions/  .cursor/rules/
+.claude/skills/  AGENTS.md  .github/instructions/  .cursor/rules/   ~/.claude/skills/
 ```
 
 ## What it is for
@@ -65,8 +65,14 @@ git add . && git commit -m "add skillforge skills"
 
 Rendered output is committed, so anyone cloning the repo gets working skills without
 installing anything. Every rendered skill is prefixed `sf-`, so `lib/eli5` is `/sf-eli5` in
-Claude Code, and skillforge never touches anything without that prefix. See [docs/consuming-skills.md](docs/consuming-skills.md) for the full
-configuration reference.
+Claude Code, and skillforge never touches anything without that prefix.
+
+To install skills user-wide instead, so Claude Code loads them in every project on your
+machine, set `claude-code: { user: true }` under `targets:`. That writes to `~/.claude/skills/`
+alongside whatever you keep there by hand; see [docs/adapters.md](docs/adapters.md) for what
+`check` does with that scope.
+
+See [docs/consuming-skills.md](docs/consuming-skills.md) for the full configuration reference.
 
 ## Quickstart, as an author
 
