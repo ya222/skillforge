@@ -19,10 +19,14 @@ Written by: whoever owns the library. Reference: [authoring-skills.md](authoring
 Params are **values**, never structure. A base declares each param's type, description and
 default; a consumer supplies values; the body reads them as `{{ params.name }}`.
 
-Values layer: the base's `default` < the consumer's repo-wide `params:` < that skill's own
-`params:`. A repo-wide param a skill does not declare is ignored, because it exists for
-whichever skills do declare it. A per-skill param the skill does not declare is an error,
-because that is always a typo.
+A consumer supplies values in two places, and they are deliberately separate:
+
+- **Skill-scoped**: `params:` under one entry in `skills:`. Applies to that skill only. Naming
+  a param the skill does not declare is an error, because that is always a typo.
+- **Shared**: top-level `shared_params:`. Applies to every skill in the list that declares the
+  param; skills that do not declare it ignore it, because it exists for the ones that do.
+
+Values layer: the base's `default` < `shared_params` < the skill's own `params`.
 
 ## 3. Anchors
 

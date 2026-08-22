@@ -7,9 +7,6 @@ version: 1
 extends:
   - ../org
 
-params:
-  max_words: 200
-
 skills:
   - from: lib/eli5
     patches:
@@ -18,3 +15,6 @@ skills:
         content: |
           > Platform team convention: every explainer links the dashboard that
           > shows the thing it explains.
+
+shared_params:
+  max_words: 200

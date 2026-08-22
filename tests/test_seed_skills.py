@@ -30,7 +30,7 @@ def test_a_markdown_project_drops_the_artifact_section(repo):
     seeded(repo)
     make_config(
         repo,
-        params={"audience": "an on-call engineer", "medium": "markdown"},
+        shared_params={"audience": "an on-call engineer", "medium": "markdown"},
         skills=[{"from": "./skills/eli5", "params": {"max_words": 120}}],
         targets={},
     )
@@ -82,3 +82,12 @@ def test_eli12_defaults_use_the_real_name_rule_and_a_higher_word_cap(repo):
     assert "Use the real name for things" in output
     assert "## The artifact" in output
     assert "## The markdown" not in output
+
+
+def test_isometric_system_map_renders(repo):
+    seeded(repo)
+    make_config(repo, skills=[{"from": "./skills/isometric-system-map"}], targets={})
+    build_and_write(repo)
+    output = rendered(repo, "isometric-system-map")
+    assert "Cite files." in output
+    assert "HTML artifact" in output

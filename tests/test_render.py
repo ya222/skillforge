@@ -52,7 +52,7 @@ def test_defaults_render_every_block(repo):
 
 def test_when_drops_a_block_and_leaves_no_scar(repo):
     make_skill(repo, params=PARAMS, body=LANG_BODY)
-    make_config(repo, params={"languages": ["python"]}, skills=[{"from": "./skills/demo"}])
+    make_config(repo, shared_params={"languages": ["python"]}, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
     output = rendered(repo, "demo")
     assert "## Python" in output
@@ -64,16 +64,16 @@ def test_per_skill_params_beat_repo_wide_params(repo):
     make_skill(repo, params=PARAMS, body=LANG_BODY)
     make_config(
         repo,
-        params={"test_command": "make test"},
+        shared_params={"test_command": "make test"},
         skills=[{"from": "./skills/demo", "params": {"test_command": "cargo test"}}],
     )
     build_and_write(repo)
     assert "Run cargo test before" in rendered(repo, "demo")
 
 
-def test_repo_wide_param_a_skill_does_not_declare_is_ignored(repo):
+def test_shared_param_a_skill_does_not_declare_is_ignored(repo):
     make_skill(repo, params=PARAMS, body=LANG_BODY)
-    make_config(repo, params={"unrelated": "value"}, skills=[{"from": "./skills/demo"}])
+    make_config(repo, shared_params={"unrelated": "value"}, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
     assert "Run pytest" in rendered(repo, "demo")
 
@@ -106,9 +106,9 @@ def test_required_param_without_a_value_is_an_error(repo):
         build(repo)
 
 
-def test_required_param_supplied_repo_wide(repo):
+def test_required_param_supplied_as_shared(repo):
     make_skill(repo, params={"owner": {"type": "string"}}, body="Owned by {{ params.owner }}.\n")
-    make_config(repo, params={"owner": "platform"}, skills=[{"from": "./skills/demo"}])
+    make_config(repo, shared_params={"owner": "platform"}, skills=[{"from": "./skills/demo"}])
     build_and_write(repo)
     assert "Owned by platform." in rendered(repo, "demo")
 

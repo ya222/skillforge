@@ -5,7 +5,7 @@ sources:
   lib:
     git: git@github.com:ya222/skillforge.git
     ref: main
-    commit: 37c9e7f919f055a4b8f926cd192f6979cc27be7c
+    commit: 7a1a3310205ffbdf3c80ec06f95492670446b1c2
   upstream:
     git: https://github.com/anthropics/claude-plugins-community.git
     ref: main

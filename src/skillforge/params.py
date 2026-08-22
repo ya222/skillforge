@@ -1,4 +1,4 @@
-"""Resolving declared params against repo-wide defaults and per-skill overrides."""
+"""Resolving declared params against shared values and per-skill overrides."""
 
 from __future__ import annotations
 
@@ -22,9 +22,9 @@ def resolve(
     overrides: dict[str, Any],
     origin: str,
 ) -> dict[str, Any]:
-    """Layer defaults < repo-wide params < per-skill params, then type-check.
+    """Layer defaults < shared_params < per-skill params, then type-check.
 
-    Repo-wide params that a skill does not declare are ignored: they exist for
+    Shared params that a skill does not declare are ignored: they exist for
     whichever skills do declare them. Per-skill overrides are strict, because an
     override naming an undeclared param is always a typo.
     """

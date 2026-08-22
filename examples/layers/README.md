@@ -13,7 +13,7 @@ Read the three `skillforge.yaml` files in that order. Each is commented and shor
 | `team` | `max_words: 200`, plus context inserted at the `after-intro` point that no other layer claims | The "Platform team convention" blockquote after the intro |
 | `project` | `audience: an on-call engineer at 3am`, a per-skill `max_words`, and a forced takeover of the `rules` block | The explainer is addressed to the on-call engineer; the rules end with the project's rule and not the org's |
 
-The rendered `max_words` is `120`: the project's per-skill param beats the team's repo-wide
+The rendered `max_words` is `120`: the project's skill-scoped param beats the team's shared
 param, which beat the org's.
 
 ## The part worth understanding

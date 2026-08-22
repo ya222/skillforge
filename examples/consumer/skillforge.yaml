@@ -20,10 +20,6 @@ sources:
     ref: main
     path: eli5/skills
 
-params:
-  audience: a product manager who has never opened the codebase
-  max_words: 300
-
 skills:
   # Configured through the contract the base skill offers.
   - from: lib/eli5
@@ -52,6 +48,12 @@ skills:
         upstream_hash: sha256:38064caba9aae8761094ec2b4ba9d64f907fec024ae28f15d2faf3b362129591
         content: |
           End with the one sentence the reader should be able to repeat afterwards.
+
+# Shared by every skill above that declares these. `eli5` does; `eli5-upstream`
+# declares nothing, so it ignores them.
+shared_params:
+  audience: a product manager who has never opened the codebase
+  max_words: 300
 
 targets:
   claude-code: {}

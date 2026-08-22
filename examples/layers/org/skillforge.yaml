@@ -11,16 +11,16 @@ sources:
     git: git@github.com:ya222/skillforge.git
     ref: main
 
-params:
-  audience: a new hire on their first day
-  max_words: 300
-
 skills:
   - from: lib/eli5
     patches:
       - block: rules
         op: append
         content: "- Never reveal a customer name, even as an example"
+
+shared_params:
+  audience: a new hire on their first day
+  max_words: 300
 
 # Targets and output are set once here and inherited by every layer below,
 # because a layer only overrides them if it says so itself.

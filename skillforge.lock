@@ -11,9 +11,15 @@ skills:
     from: ./skills/eli5
     version: 1.0.0
     source_hash: sha256:7c776956ef28e3d0633444292f53677b76da10a913b3d429aea2fb7e4758d84c
+  isometric-system-map:
+    from: ./skills/isometric-system-map
+    version: 1.0.0
+    source_hash: sha256:25e90384321391259993d4c02abd6b430be4ab9dc469e53959025577904d8d39
 outputs:
   .agents/skills/eli12/SKILL.md: sha256:05264eee94ca6d1c760d1f02130c5883bf5ddc8af789c80ce442da46e95e2a26
   .agents/skills/eli5/SKILL.md: sha256:ed443fd8cfa1577cd815c2df9b92e0bb2f4faac7e90c90741138a1baf511cb6d
+  .agents/skills/isometric-system-map/SKILL.md: sha256:2aa0bf62af81b919ed2bf55eda69179205eb8cb131dd5be8e8eedbdcfe176d99
   .claude/skills/eli12/SKILL.md: sha256:05264eee94ca6d1c760d1f02130c5883bf5ddc8af789c80ce442da46e95e2a26
   .claude/skills/eli5/SKILL.md: sha256:ed443fd8cfa1577cd815c2df9b92e0bb2f4faac7e90c90741138a1baf511cb6d
-  AGENTS.md#skillforge: sha256:d0c715eab4e14dc9d79e9c013789f4fdea5ccf3e0247d5555f302aa503b884fb
+  .claude/skills/isometric-system-map/SKILL.md: sha256:2aa0bf62af81b919ed2bf55eda69179205eb8cb131dd5be8e8eedbdcfe176d99
+  AGENTS.md#skillforge: sha256:82b7ba5f37e55e876ee6235eb83e3c152f1973bb4aea3d71f34ca05e5b36b519

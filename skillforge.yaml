@@ -8,6 +8,7 @@ skills:
     params:
       max_words: 1000
       medium: markdown
+  - from: ./skills/isometric-system-map
 
 targets:
   claude-code: {}

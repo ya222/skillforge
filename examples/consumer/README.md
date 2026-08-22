@@ -11,7 +11,7 @@ example. Everything else in this directory is generated.
 | Thing | Where |
 | --- | --- |
 | Importing over git, pinned by commit | `sources:` and [`skillforge.lock`](skillforge.lock) |
-| Repo-wide params, overridden per skill | `params:` at both levels |
+| Shared params, overridden per skill | `shared_params:` at the top, `params:` under `lib/eli5` |
 | A `when` block disappearing | no "The artifact" section in the rendered `eli5`, because `medium` is `markdown` |
 | Extending through an anchor | the `after-intro` insert and the `rules` append |
 | Patching a library that never heard of skillforge | the `upstream/eli5` entry, targeted by heading path with a pinned hash |

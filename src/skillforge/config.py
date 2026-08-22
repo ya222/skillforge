@@ -11,7 +11,7 @@ from skillforge.errors import ConfigError
 from skillforge.model import Config, SkillRequest, Source, _reject_unknown
 
 CONFIG_NAME = "skillforge.yaml"
-TOP_LEVEL_KEYS = ("version", "extends", "sources", "params", "skills", "targets", "output")
+TOP_LEVEL_KEYS = ("version", "extends", "sources", "skills", "shared_params", "targets", "output")
 
 
 def load_raw(path: Path) -> dict[str, Any]:
@@ -54,7 +54,7 @@ def parse_layer(path: Path, layer: str) -> Config:
         root=root,
         extends=list(raw.get("extends") or []),
         sources=sources,
-        params=dict(raw.get("params") or {}),
+        params=dict(raw.get("shared_params") or {}),
         skills=skills,
         targets=dict(raw.get("targets") or {}),
         output=raw.get("output", ".agents/skills"),

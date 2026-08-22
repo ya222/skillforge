@@ -21,9 +21,9 @@ STARTER = """version: 1
 
 sources: {}
 
-params: {}
-
 skills: []
+
+shared_params: {}
 
 targets:
   claude-code: {}

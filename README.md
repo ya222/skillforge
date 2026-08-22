@@ -37,14 +37,15 @@ Then edit `skillforge.yaml`:
 version: 1
 
 sources:
-  lib: { git: https://github.com/ya222/skillforge, ref: main }
-
-params:
-  audience: a new hire on their first day
-  max_words: 300
+  lib:
+    git: https://github.com/ya222/skillforge
+    ref: main
 
 skills:
   - from: lib/eli5
+    params:
+      audience: a new hire on their first day
+      max_words: 300
     patches:
       - point: after-intro
         op: insert
@@ -78,6 +79,7 @@ params and marks the passages consumers are allowed to change. See
 | --- | --- |
 | [`eli5`](skills/eli5/SKILL.md) | Explain a topic with big pictures and few words |
 | [`eli12`](skills/eli12/SKILL.md) | Explain a topic with real words, cause and effect, and something to try |
+| [`isometric-system-map`](skills/isometric-system-map/SKILL.md) | Draw a codebase's infrastructure as an isometric map, citing files |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output.

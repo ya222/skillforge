@@ -25,10 +25,6 @@
         }
       }
     },
-    "params": {
-      "type": "object",
-      "description": "Repo-wide param values. Skills that do not declare a param ignore it."
-    },
     "skills": {
       "type": "array",
       "items": {
@@ -38,10 +34,14 @@
         "properties": {
           "from": { "type": "string" },
           "as": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
-          "params": { "type": "object" },
+          "params": { "type": "object", "description": "Values for this skill only. Override shared_params." },
           "patches": { "type": "array", "items": { "$ref": "#/$defs/patch" } }
         }
       }
+    },
+    "shared_params": {
+      "type": "object",
+      "description": "Param values shared by every skill in the list. A skill's own `params` override them; a skill that does not declare a shared param ignores it."
     },
     "targets": {
       "type": "object",

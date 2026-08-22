@@ -7,9 +7,6 @@ version: 1
 extends:
   - ../team
 
-params:
-  audience: an on-call engineer at 3am
-
 skills:
   - from: lib/eli5
     params:
@@ -29,3 +26,6 @@ skills:
         op: append
         force: true
         content: "- Lead with what to do, then why; the why can wait until the pager is quiet"
+
+shared_params:
+  audience: an on-call engineer at 3am

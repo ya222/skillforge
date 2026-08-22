@@ -31,7 +31,7 @@ def test_extends_pulls_skills_and_params_from_a_parent_layer(repo):
         repo,
         "org",
         {
-            "params": {"owner": "platform"},
+            "shared_params": {"owner": "platform"},
             "skills": [{"from": "../skills/demo"}],
         },
     )
@@ -47,9 +47,11 @@ def test_a_later_layer_overrides_a_param(repo):
         body="Owner: {{ params.owner }}\n",
     )
     make_layer(
-        repo, "org", {"params": {"owner": "platform"}, "skills": [{"from": "../skills/demo"}]}
+        repo,
+        "org",
+        {"shared_params": {"owner": "platform"}, "skills": [{"from": "../skills/demo"}]},
     )
-    make_config(repo, extends=["./org"], params={"owner": "project-x"}, skills=[])
+    make_config(repo, extends=["./org"], shared_params={"owner": "project-x"}, skills=[])
     build_and_write(repo)
     assert "Owner: project-x" in rendered(repo, "demo")
 

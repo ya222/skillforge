@@ -13,22 +13,27 @@ extends:
   - org                      # a source alias, or a path like ../shared
 
 sources:
-  lib:      { git: https://github.com/ya222/skillforge, ref: v0.1.0 }
-  upstream: { git: https://github.com/anthropics/claude-plugins-community, ref: main, path: eli5/skills }
-
-params:
-  audience: a new hire
-  max_words: 300
+  lib:
+    git: https://github.com/ya222/skillforge
+    ref: v0.1.0
+  upstream:
+    git: https://github.com/anthropics/claude-plugins-community
+    ref: main
+    path: eli5/skills
 
 skills:
   - from: lib/eli5
     as: explain                        # optional rename
-    params:
+    params:                            # this skill only
       medium: markdown
     patches:
       - { block: rules, op: append, content: "- Link the runbook at the end" }
 
   - from: ./skills/house-style          # a skill this repo owns
+
+shared_params:                         # every skill above that declares these
+  audience: a new hire
+  max_words: 300
 
 targets:
   claude-code: {}
@@ -44,8 +49,8 @@ output: .agents/skills
 | `version` | Config format version. Currently always `1` |
 | `extends` | Parent configs, applied in listed order before this file |
 | `sources` | Git repositories to import from. `ref` is a branch, tag or SHA; `path` is where skills live in that repo, default `skills` |
-| `params` | Repo-wide param values |
-| `skills` | What to render |
+| `skills` | What to render. Each entry's own `params:` apply to that skill only |
+| `shared_params` | Values for every skill in the list that declares them. A skill's own `params` win |
 | `targets` | Which harnesses to emit for. See [adapters.md](adapters.md) |
 | `output` | Canonical rendered directory, default `.agents/skills` |
 
