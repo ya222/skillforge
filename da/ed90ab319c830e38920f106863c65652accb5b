@@ -1,0 +1,29 @@
+skills/claude-session-limits/SKILL.md
+  s_740d1780779f08::t_36a3d833b8db4b 1-26
+AGENTS.md
+  s_740d1780779f08::t_3767808f0209d0 80
+.agents/skills/sf-claude-session-limits/SKILL.md
+  s_740d1780779f08::t_3767808f0209d0 1-27
+.claude/skills/sf-claude-session-limits/SKILL.md
+  s_740d1780779f08::t_3767808f0209d0 1-27
+skillforge.yaml
+  s_740d1780779f08::t_c880b8a69724ad 19
+skillforge.lock
+  s_740d1780779f08::t_9ccb39bff37807 14-17,58,92,119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "daed90ab319c830e38920f106863c65652accb5b",
+  "prompts": {},
+  "sessions": {
+    "s_740d1780779f08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e1507d5-a563-4c23-8ea6-78b1d9a42054",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Youssef <y9mohamed@gmail.com>"
+    }
+  }
+}
