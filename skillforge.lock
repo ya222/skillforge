@@ -11,6 +11,10 @@ skills:
     from: ./skills/architecture-designer
     version: 1.0.0
     source_hash: sha256:45676f035cb02e059b6c9bce315a5b837ab8b67a5cf03553e1281d3f749d8740
+  sf-claude-session-limits:
+    from: ./skills/claude-session-limits
+    version: 1.0.0
+    source_hash: sha256:c776775f9071206cde9a4caaf9ef20b8af882e661b3d4b4acd593e8d9f2fefde
   sf-dev-style:
     from: ./skills/dev-style
     version: 1.0.0
@@ -51,6 +55,7 @@ outputs:
   .agents/skills/sf-architecture-designer/references/database-selection.md: sha256:6439a36138654947acb808eeff1fff5862894ef94a7210e8fd540bb2641c5a80
   .agents/skills/sf-architecture-designer/references/nfr-checklist.md: sha256:37b9b0f083bd224acccb04eec86edc09a494c693a4ad0ec32ea24f472c122d70
   .agents/skills/sf-architecture-designer/references/system-design.md: sha256:b33ff621c6461eb321d18fc9923c4bba689776e1cd0f0c00945584c2698319a1
+  .agents/skills/sf-claude-session-limits/SKILL.md: sha256:fd239255d7cfd666b1cf5dd77a71046987cb67094fbceb990517b3f713dcd2d6
   .agents/skills/sf-dev-style/SKILL.md: sha256:c14f034b104e1884025e736879d88f69c7b50c6eaaedba3f880ae0b27ef5fbbb
   .agents/skills/sf-eli12/SKILL.md: sha256:29701d00a75c056f3467f368957e79d1cf287828b5425a29a0bc625205ef0dc2
   .agents/skills/sf-eli5/SKILL.md: sha256:ede6aa581d50ee396f0ed2f680ba5a5e25378670ba5df886de688dcd4287e1f7
@@ -84,6 +89,7 @@ outputs:
   .claude/skills/sf-architecture-designer/references/database-selection.md: sha256:6439a36138654947acb808eeff1fff5862894ef94a7210e8fd540bb2641c5a80
   .claude/skills/sf-architecture-designer/references/nfr-checklist.md: sha256:37b9b0f083bd224acccb04eec86edc09a494c693a4ad0ec32ea24f472c122d70
   .claude/skills/sf-architecture-designer/references/system-design.md: sha256:b33ff621c6461eb321d18fc9923c4bba689776e1cd0f0c00945584c2698319a1
+  .claude/skills/sf-claude-session-limits/SKILL.md: sha256:fd239255d7cfd666b1cf5dd77a71046987cb67094fbceb990517b3f713dcd2d6
   .claude/skills/sf-dev-style/SKILL.md: sha256:c14f034b104e1884025e736879d88f69c7b50c6eaaedba3f880ae0b27ef5fbbb
   .claude/skills/sf-eli12/SKILL.md: sha256:29701d00a75c056f3467f368957e79d1cf287828b5425a29a0bc625205ef0dc2
   .claude/skills/sf-eli5/SKILL.md: sha256:ede6aa581d50ee396f0ed2f680ba5a5e25378670ba5df886de688dcd4287e1f7
@@ -110,4 +116,4 @@ outputs:
   .claude/skills/sf-skill-creator/scripts/run_eval.py: sha256:43e3b8f80dbf69c343967ba77e268fae991d9fa3ed68b32a0ff02532cd48657f
   .claude/skills/sf-skill-creator/scripts/run_loop.py: sha256:7bd6f674203168520517eec94c55f493c0d154339b061b4d7c0f0dad187d0f21
   .claude/skills/sf-skill-creator/scripts/utils.py: sha256:3af8ae62c40c73ab712207436a0d9a981e845f25c5a7040229eb189cc8e45bb1
-  AGENTS.md#skillforge: sha256:f5490dfdd5cc090e4336054405d9b17481069e0b1b42d4df098dd055c8f559bc
+  AGENTS.md#skillforge: sha256:38ebe84374ef107bae2726404db2e778783ae212e6cf9ae31736f74f4070b088
