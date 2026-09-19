@@ -91,6 +91,7 @@ params and marks the passages consumers are allowed to change. See
 | [`skill-creator`](skills/skill-creator/SKILL.md) | Create, evaluate, and improve skills, with bundled eval tooling |
 | [`architecture-designer`](skills/architecture-designer/SKILL.md) | Design a system, choose patterns, write ADRs, with bundled reference guides |
 | [`architect-review`](skills/architect-review/SKILL.md) | Review a design or major change for architectural integrity |
+| [`claude-session-limits`](skills/claude-session-limits/SKILL.md) | Report the Claude Code session's 5-hour and 7-day usage limits |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text
