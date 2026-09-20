@@ -93,6 +93,7 @@ params and marks the passages consumers are allowed to change. See
 | [`architect-review`](skills/architect-review/SKILL.md) | Review a design or major change for architectural integrity |
 | [`claude-session-limits`](skills/claude-session-limits/SKILL.md) | Report the Claude Code session's 5-hour and 7-day usage limits |
 | [`markdown-kanban`](skills/markdown-kanban/SKILL.md) | Keep project todo boards in the Markdown Kanban format, one board per workstream |
+| [`cloudflare-quick-tunnel`](skills/cloudflare-quick-tunnel/SKILL.md) | Put a local server on a public HTTPS URL with `cloudflared`, and know the limits |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text

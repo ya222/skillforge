@@ -9,3 +9,6 @@ __pycache__/
 .ruff_cache/
 dist/
 *.egg-info/
+
+# local claude settings
+.claude/settings.local.json

@@ -18,6 +18,7 @@ skills:
   - from: ./skills/architect-review
   - from: ./skills/claude-session-limits
   - from: ./skills/markdown-kanban
+  - from: ./skills/cloudflare-quick-tunnel
 
 targets:
   claude-code: {}
