@@ -1,0 +1,25 @@
+.agents/skills/sf-markdown-kanban/SKILL.md
+  s_2eb43ef7d91a57::t_35db82b790dd8a 6,26-31,42-43,79-83
+skills/markdown-kanban/SKILL.md
+  s_2eb43ef7d91a57::t_6adf01300a9786 6,31-36,47-48,84-88
+.claude/skills/sf-markdown-kanban/SKILL.md
+  s_2eb43ef7d91a57::t_35db82b790dd8a 6,26-31,42-43,79-83
+skillforge.lock
+  s_2eb43ef7d91a57::t_66b6c1b0c2c9bf 48-49,71,106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0db5a689d0037ce2ec1a094eb924315240355e02",
+  "prompts": {},
+  "sessions": {
+    "s_2eb43ef7d91a57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bee53b67-b40d-46e4-932e-e0b6d0838bd3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Youssef <y9mohamed@gmail.com>"
+    }
+  }
+}
