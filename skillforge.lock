@@ -45,8 +45,8 @@ skills:
     source_hash: sha256:f3a849a373afbdc2d2a42d634609ec56519dbf99ec2cee5a9cc4947fedf5bdd4
   sf-markdown-kanban:
     from: ./skills/markdown-kanban
-    version: 1.0.2
-    source_hash: sha256:9bc4f3c10238ec8f3d85f861fa8413f5dec79003d91d2a808f33aa8642f4926d
+    version: 1.1.0
+    source_hash: sha256:dd646187a52bc80e39a99c404e8d1c787ae03e4ee482b7a28125c469da44aa07
   sf-skill-creator:
     from: ./skills/skill-creator
     version: 1.0.0
@@ -68,7 +68,7 @@ outputs:
   .agents/skills/sf-grill-me/SKILL.md: sha256:28035ca2407f0ccd52af7156087ec6b7043e070a9136fe66bfe186503682c59d
   .agents/skills/sf-handoff/SKILL.md: sha256:31e807bab0a9aeed374cec7e2649890841321b08242effbd79f9f8315d7d4274
   .agents/skills/sf-isometric-system-map/SKILL.md: sha256:80f890b0b98df818bad949b0e679f28be7ee386ebb879ec5d74953397e179d08
-  .agents/skills/sf-markdown-kanban/SKILL.md: sha256:f887675fc899a0ad7ea2772f763bd6de9e256ad3ce553c87affa01504086b801
+  .agents/skills/sf-markdown-kanban/SKILL.md: sha256:4b2c978c9b64b1fa1331387aa76ebc298cf417a753240685fd1498608fbbaf04
   .agents/skills/sf-skill-creator/LICENSE.txt: sha256:bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362
   .agents/skills/sf-skill-creator/SKILL.md: sha256:5614663d501f668a3e2a3fb80e6503c63bb52caa379715dbebfce173612e46d8
   .agents/skills/sf-skill-creator/agents/analyzer.md: sha256:bf68f4cac5a56c673a928c2e6d619586c5b93ea364026ab37547772cb45a663a
@@ -103,7 +103,7 @@ outputs:
   .claude/skills/sf-grill-me/SKILL.md: sha256:28035ca2407f0ccd52af7156087ec6b7043e070a9136fe66bfe186503682c59d
   .claude/skills/sf-handoff/SKILL.md: sha256:31e807bab0a9aeed374cec7e2649890841321b08242effbd79f9f8315d7d4274
   .claude/skills/sf-isometric-system-map/SKILL.md: sha256:80f890b0b98df818bad949b0e679f28be7ee386ebb879ec5d74953397e179d08
-  .claude/skills/sf-markdown-kanban/SKILL.md: sha256:f887675fc899a0ad7ea2772f763bd6de9e256ad3ce553c87affa01504086b801
+  .claude/skills/sf-markdown-kanban/SKILL.md: sha256:4b2c978c9b64b1fa1331387aa76ebc298cf417a753240685fd1498608fbbaf04
   .claude/skills/sf-skill-creator/LICENSE.txt: sha256:bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362
   .claude/skills/sf-skill-creator/SKILL.md: sha256:5614663d501f668a3e2a3fb80e6503c63bb52caa379715dbebfce173612e46d8
   .claude/skills/sf-skill-creator/agents/analyzer.md: sha256:bf68f4cac5a56c673a928c2e6d619586c5b93ea364026ab37547772cb45a663a

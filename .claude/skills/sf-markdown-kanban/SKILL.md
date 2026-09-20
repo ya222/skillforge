@@ -3,7 +3,7 @@ name: sf-markdown-kanban
 description: Create, inspect, and update project todo boards that use the Markdown Kanban heading and task-property format. Use when a project tracks work in TODO.md, *.todo.md, or *.kanban.md files; when moving tasks between status columns; when adding task metadata or checklist steps; or when a repository may contain multiple independent Markdown todo boards.
 metadata:
   skillforge:
-    version: 1.0.2
+    version: 1.1.0
     source: ./skills/markdown-kanban
     attribution: Adapted from holooooo/markdown-kanban (MIT), skills/markdown-kanban at 6247e4b7acb2.
 ---
@@ -23,6 +23,12 @@ Manage project work as Markdown without assuming that a repository has only one 
 2. Select the board that matches the requested workstream. Read the full file before changing it.
 3. If several boards could apply and repository context does not resolve the choice, ask which board to use.
 4. Create a separate `<workstream>.todo.md` when the work is independent from existing boards. Do not merge unrelated workstreams into one board merely because a todo file already exists.
+5. When creating a board, put a pointer to this skill directly under the board title so the next
+   agent to open the file knows the format is load-bearing:
+
+   ```markdown
+   > Agents: load the markdown-kanban skill before editing this board.
+   ```
 
 ## Use the format
 
@@ -32,6 +38,8 @@ copying the example. A column whose heading ends in `[Archived]` is treated as a
 
 ````markdown
 # Product delivery
+
+> Agents: load the markdown-kanban skill before editing this board.
 
 ## Todo
 
@@ -68,9 +76,11 @@ Use only these task properties:
 
 Indent fenced descriptions by four spaces as shown. Omit empty properties instead of writing placeholders.
 
-Keep prose out of the region between the board title and the first column heading. A Markdown
-Kanban editor rewriting the board drops whatever sits there, so notes and links survive only
-inside a task description.
+Keep prose out of the region between the board title and the first column heading, with one
+exception: the pointer line above. A Markdown Kanban editor rewriting the board drops everything
+it does not parse, including that line, so re-add it whenever you find a board without one and
+keep every other note inside a task description, which is the only place prose survives a
+rewrite.
 
 ## Update tasks
 
