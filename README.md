@@ -92,14 +92,16 @@ params and marks the passages consumers are allowed to change. See
 | [`architecture-designer`](skills/architecture-designer/SKILL.md) | Design a system, choose patterns, write ADRs, with bundled reference guides |
 | [`architect-review`](skills/architect-review/SKILL.md) | Review a design or major change for architectural integrity |
 | [`claude-session-limits`](skills/claude-session-limits/SKILL.md) | Report the Claude Code session's 5-hour and 7-day usage limits |
+| [`markdown-kanban`](skills/markdown-kanban/SKILL.md) | Keep project todo boards in the Markdown Kanban format, one board per workstream |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text
 is in [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt). `dev-style` condenses the
 [Google developer documentation style guide](https://developers.google.com/style), CC BY 4.0. `handoff` and `grill-me` are
 adapted from [mattpocock/skills](https://github.com/mattpocock/skills), `architecture-designer` from
-[Jeffallan/claude-skills](https://github.com/Jeffallan/claude-skills), and `architect-review` from
-[rmyndharis/antigravity-skills](https://github.com/rmyndharis/antigravity-skills), all MIT. `frontend-design` and
+[Jeffallan/claude-skills](https://github.com/Jeffallan/claude-skills), `architect-review` from
+[rmyndharis/antigravity-skills](https://github.com/rmyndharis/antigravity-skills), and `markdown-kanban` from
+[holooooo/markdown-kanban](https://github.com/holooooo/markdown-kanban), all MIT. `frontend-design` and
 `skill-creator` are from [anthropics/skills](https://github.com/anthropics/skills), Apache-2.0, with the
 licence bundled alongside each.
 

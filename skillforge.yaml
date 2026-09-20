@@ -17,6 +17,7 @@ skills:
   - from: ./skills/architecture-designer
   - from: ./skills/architect-review
   - from: ./skills/claude-session-limits
+  - from: ./skills/markdown-kanban
 
 targets:
   claude-code: {}
