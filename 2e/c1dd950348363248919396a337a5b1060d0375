@@ -1,0 +1,51 @@
+skills/claude-session-export/scripts/export_session.py
+  s_4f3b4ee6f790dc::t_40113b6a3c27d4 1-141,143-144,146-213,215-216,225-275,277-282,284-289,291-315
+  s_4f3b4ee6f790dc::t_d5e08e39e0e577 217-224
+  s_4f3b4ee6f790dc::t_755a46025f5ed3 142
+  s_4f3b4ee6f790dc::t_25262eabf32e16 145
+  s_4f3b4ee6f790dc::t_79bc6b674b6356 214
+  s_4f3b4ee6f790dc::t_247b2f2cba8831 276
+  s_4f3b4ee6f790dc::t_b6ffd8c785e1d3 283
+  s_4f3b4ee6f790dc::t_1e718c9f9bcd4d 290
+skills/obsidian-vault/SKILL.md
+  s_4f3b4ee6f790dc::t_b9acb99bc25807 48-55
+  s_4f3b4ee6f790dc::t_c82be849269240 1-47,56-61
+skills/claude-session-export/SKILL.md
+  s_4f3b4ee6f790dc::t_c4db244994e769 1-48
+.agents/skills/sf-claude-session-export/SKILL.md
+  s_4f3b4ee6f790dc::t_67f865396e79cc 1-47
+.agents/skills/sf-claude-session-export/scripts/export_session.py
+  s_4f3b4ee6f790dc::t_e0b0af7eaf0d86 1-315
+.agents/skills/sf-obsidian-vault/SKILL.md
+  s_4f3b4ee6f790dc::t_6fc522e79b131a 1-56
+.claude/skills/sf-claude-session-export/SKILL.md
+  s_4f3b4ee6f790dc::t_ac1f16497e2d72 1-47
+.claude/skills/sf-claude-session-export/scripts/export_session.py
+  s_4f3b4ee6f790dc::t_3b9b6e4b1e0145 1-315
+.claude/skills/sf-obsidian-vault/SKILL.md
+  s_4f3b4ee6f790dc::t_06104fd8512fc0 1-56
+AGENTS.md
+  s_4f3b4ee6f790dc::t_24d04238ea9964 80,91
+README.md
+  s_4f3b4ee6f790dc::t_9a8c81f7c0c5f7 97-98
+skillforge.lock
+  s_4f3b4ee6f790dc::t_4a33e8c50b3ec6 14-17,58-61,74-75,87,113-114,126,145
+skillforge.yaml
+  s_4f3b4ee6f790dc::t_b54c48de173fd4 22-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2ec1dd950348363248919396a337a5b1060d0375",
+  "prompts": {},
+  "sessions": {
+    "s_4f3b4ee6f790dc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7d0974f3-fe45-48de-bb77-ec5d957b2ee6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Youssef <y9mohamed@gmail.com>"
+    }
+  }
+}
