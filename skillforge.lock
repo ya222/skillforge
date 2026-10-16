@@ -11,6 +11,10 @@ skills:
     from: ./skills/architecture-designer
     version: 1.0.0
     source_hash: sha256:45676f035cb02e059b6c9bce315a5b837ab8b67a5cf03553e1281d3f749d8740
+  sf-claude-session-export:
+    from: ./skills/claude-session-export
+    version: 1.0.0
+    source_hash: sha256:ad72f2a26e9caf911fc121b3cd03a384dbb7abc8a9623f479059a18c10e755e9
   sf-claude-session-limits:
     from: ./skills/claude-session-limits
     version: 1.0.0
@@ -63,6 +67,8 @@ outputs:
   .agents/skills/sf-architecture-designer/references/database-selection.md: sha256:6439a36138654947acb808eeff1fff5862894ef94a7210e8fd540bb2641c5a80
   .agents/skills/sf-architecture-designer/references/nfr-checklist.md: sha256:37b9b0f083bd224acccb04eec86edc09a494c693a4ad0ec32ea24f472c122d70
   .agents/skills/sf-architecture-designer/references/system-design.md: sha256:b33ff621c6461eb321d18fc9923c4bba689776e1cd0f0c00945584c2698319a1
+  .agents/skills/sf-claude-session-export/SKILL.md: sha256:d5e52cb64e6978e4d25eb0a517b2a38e6bfc8bdca286323919a765a366a3aeea
+  .agents/skills/sf-claude-session-export/scripts/export_session.py: sha256:2e376a52334ac8cfba812ed1001fa1cb64a9abbc43f77c4931beaed2ec6ac9d7
   .agents/skills/sf-claude-session-limits/SKILL.md: sha256:fd239255d7cfd666b1cf5dd77a71046987cb67094fbceb990517b3f713dcd2d6
   .agents/skills/sf-cloudflare-quick-tunnel/SKILL.md: sha256:90a3236e3d948eedee7326dbcc322033ba70d3751c881f7c9c48a3752583a079
   .agents/skills/sf-dev-style/SKILL.md: sha256:c14f034b104e1884025e736879d88f69c7b50c6eaaedba3f880ae0b27ef5fbbb
@@ -99,6 +105,8 @@ outputs:
   .claude/skills/sf-architecture-designer/references/database-selection.md: sha256:6439a36138654947acb808eeff1fff5862894ef94a7210e8fd540bb2641c5a80
   .claude/skills/sf-architecture-designer/references/nfr-checklist.md: sha256:37b9b0f083bd224acccb04eec86edc09a494c693a4ad0ec32ea24f472c122d70
   .claude/skills/sf-architecture-designer/references/system-design.md: sha256:b33ff621c6461eb321d18fc9923c4bba689776e1cd0f0c00945584c2698319a1
+  .claude/skills/sf-claude-session-export/SKILL.md: sha256:d5e52cb64e6978e4d25eb0a517b2a38e6bfc8bdca286323919a765a366a3aeea
+  .claude/skills/sf-claude-session-export/scripts/export_session.py: sha256:2e376a52334ac8cfba812ed1001fa1cb64a9abbc43f77c4931beaed2ec6ac9d7
   .claude/skills/sf-claude-session-limits/SKILL.md: sha256:fd239255d7cfd666b1cf5dd77a71046987cb67094fbceb990517b3f713dcd2d6
   .claude/skills/sf-cloudflare-quick-tunnel/SKILL.md: sha256:90a3236e3d948eedee7326dbcc322033ba70d3751c881f7c9c48a3752583a079
   .claude/skills/sf-dev-style/SKILL.md: sha256:c14f034b104e1884025e736879d88f69c7b50c6eaaedba3f880ae0b27ef5fbbb
@@ -128,4 +136,4 @@ outputs:
   .claude/skills/sf-skill-creator/scripts/run_eval.py: sha256:43e3b8f80dbf69c343967ba77e268fae991d9fa3ed68b32a0ff02532cd48657f
   .claude/skills/sf-skill-creator/scripts/run_loop.py: sha256:7bd6f674203168520517eec94c55f493c0d154339b061b4d7c0f0dad187d0f21
   .claude/skills/sf-skill-creator/scripts/utils.py: sha256:3af8ae62c40c73ab712207436a0d9a981e845f25c5a7040229eb189cc8e45bb1
-  AGENTS.md#skillforge: sha256:421992bbafd733c7ea73f7fbb96d7357c4cf8f8f340450f302b6fee3e113722b
+  AGENTS.md#skillforge: sha256:00e01978bf87955e4b7432707b2d728e480ce1e3a53faf94545ee34653a81eec

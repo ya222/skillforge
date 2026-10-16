@@ -19,6 +19,7 @@ skills:
   - from: ./skills/claude-session-limits
   - from: ./skills/markdown-kanban
   - from: ./skills/cloudflare-quick-tunnel
+  - from: ./skills/claude-session-export
 
 targets:
   claude-code: {}
