@@ -1,5 +1,7 @@
 # skillforge
 
+<p align="center"><img src="docs/skillforge.png" width="280" alt="A pixel-art Clawd holding a hammer"></p>
+
 A versioned library of portable AI agent skills, plus a composition layer that lets other
 repositories import those skills, configure them, extend them, and add their own.
 
