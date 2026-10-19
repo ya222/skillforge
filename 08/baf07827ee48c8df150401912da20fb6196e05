@@ -1,0 +1,19 @@
+README.md
+  s_100a135c2416b7::t_385203a8eb2099 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "08baf07827ee48c8df150401912da20fb6196e05",
+  "prompts": {},
+  "sessions": {
+    "s_100a135c2416b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "921c4911-cd8d-4098-b88d-0fe3bd0a1dd8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Youssef <y9mohamed@gmail.com>"
+    }
+  }
+}
