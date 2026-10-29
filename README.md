@@ -99,6 +99,7 @@ params and marks the passages consumers are allowed to change. See
 | [`claude-session-export`](skills/claude-session-export/SKILL.md) | Export a Claude Code session to Markdown with a script, without loading it into context |
 | [`obsidian-vault`](skills/obsidian-vault/SKILL.md) | Find, create and edit notes in a local Obsidian vault from any project |
 | [`deepseek-paraphrase`](skills/deepseek-paraphrase/SKILL.md) | Reword text with DeepSeek through a script, keeping meaning and structure |
+| [`security-audit`](skills/security-audit/SKILL.md) | Source-first security review or full multi-agent audit, with validators for its findings |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text
@@ -107,7 +108,8 @@ is in [LICENSES/Apache-2.0.txt](LICENSES/Apache-2.0.txt). `dev-style` condenses 
 adapted from [mattpocock/skills](https://github.com/mattpocock/skills), `architecture-designer` from
 [Jeffallan/claude-skills](https://github.com/Jeffallan/claude-skills), `architect-review` from
 [rmyndharis/antigravity-skills](https://github.com/rmyndharis/antigravity-skills), and `markdown-kanban` from
-[holooooo/markdown-kanban](https://github.com/holooooo/markdown-kanban), all MIT. `frontend-design` and
+[holooooo/markdown-kanban](https://github.com/holooooo/markdown-kanban), all MIT. `security-audit` is from
+[cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill), MIT, with the licence bundled. `frontend-design` and
 `skill-creator` are from [anthropics/skills](https://github.com/anthropics/skills), Apache-2.0, with the
 licence bundled alongside each.
 

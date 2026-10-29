@@ -21,6 +21,7 @@ skills:
   - from: ./skills/cloudflare-quick-tunnel
   - from: ./skills/claude-session-export
   - from: ./skills/deepseek-paraphrase
+  - from: ./skills/security-audit
 
 targets:
   claude-code: {}
