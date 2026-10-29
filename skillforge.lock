@@ -23,6 +23,10 @@ skills:
     from: ./skills/cloudflare-quick-tunnel
     version: 1.2.0
     source_hash: sha256:46f056da484fd429847bcd3d259941b71551af0c5cc484905b52ae3a868a9b58
+  sf-deepseek-paraphrase:
+    from: ./skills/deepseek-paraphrase
+    version: 1.0.0
+    source_hash: sha256:2ebf3eb308c24eeab38ce710e8ea3a00a3ef9276ab813b7b3c06d570e14d5794
   sf-dev-style:
     from: ./skills/dev-style
     version: 1.0.0
@@ -71,6 +75,8 @@ outputs:
   .agents/skills/sf-claude-session-export/scripts/export_session.py: sha256:2e376a52334ac8cfba812ed1001fa1cb64a9abbc43f77c4931beaed2ec6ac9d7
   .agents/skills/sf-claude-session-limits/SKILL.md: sha256:fd239255d7cfd666b1cf5dd77a71046987cb67094fbceb990517b3f713dcd2d6
   .agents/skills/sf-cloudflare-quick-tunnel/SKILL.md: sha256:90a3236e3d948eedee7326dbcc322033ba70d3751c881f7c9c48a3752583a079
+  .agents/skills/sf-deepseek-paraphrase/SKILL.md: sha256:5fc8eeeba879301d2eb605b9a00246c9663173469b4db077f70fbe10e53f8e3f
+  .agents/skills/sf-deepseek-paraphrase/scripts/paraphrase.py: sha256:fbb0a8da7b347f4231a4d687112f44b53e7413d93c358809bb40ca734d9ca81f
   .agents/skills/sf-dev-style/SKILL.md: sha256:c14f034b104e1884025e736879d88f69c7b50c6eaaedba3f880ae0b27ef5fbbb
   .agents/skills/sf-eli12/SKILL.md: sha256:29701d00a75c056f3467f368957e79d1cf287828b5425a29a0bc625205ef0dc2
   .agents/skills/sf-eli5/SKILL.md: sha256:ede6aa581d50ee396f0ed2f680ba5a5e25378670ba5df886de688dcd4287e1f7
@@ -109,6 +115,8 @@ outputs:
   .claude/skills/sf-claude-session-export/scripts/export_session.py: sha256:2e376a52334ac8cfba812ed1001fa1cb64a9abbc43f77c4931beaed2ec6ac9d7
   .claude/skills/sf-claude-session-limits/SKILL.md: sha256:fd239255d7cfd666b1cf5dd77a71046987cb67094fbceb990517b3f713dcd2d6
   .claude/skills/sf-cloudflare-quick-tunnel/SKILL.md: sha256:90a3236e3d948eedee7326dbcc322033ba70d3751c881f7c9c48a3752583a079
+  .claude/skills/sf-deepseek-paraphrase/SKILL.md: sha256:5fc8eeeba879301d2eb605b9a00246c9663173469b4db077f70fbe10e53f8e3f
+  .claude/skills/sf-deepseek-paraphrase/scripts/paraphrase.py: sha256:fbb0a8da7b347f4231a4d687112f44b53e7413d93c358809bb40ca734d9ca81f
   .claude/skills/sf-dev-style/SKILL.md: sha256:c14f034b104e1884025e736879d88f69c7b50c6eaaedba3f880ae0b27ef5fbbb
   .claude/skills/sf-eli12/SKILL.md: sha256:29701d00a75c056f3467f368957e79d1cf287828b5425a29a0bc625205ef0dc2
   .claude/skills/sf-eli5/SKILL.md: sha256:ede6aa581d50ee396f0ed2f680ba5a5e25378670ba5df886de688dcd4287e1f7
@@ -136,4 +144,4 @@ outputs:
   .claude/skills/sf-skill-creator/scripts/run_eval.py: sha256:43e3b8f80dbf69c343967ba77e268fae991d9fa3ed68b32a0ff02532cd48657f
   .claude/skills/sf-skill-creator/scripts/run_loop.py: sha256:7bd6f674203168520517eec94c55f493c0d154339b061b4d7c0f0dad187d0f21
   .claude/skills/sf-skill-creator/scripts/utils.py: sha256:3af8ae62c40c73ab712207436a0d9a981e845f25c5a7040229eb189cc8e45bb1
-  AGENTS.md#skillforge: sha256:00e01978bf87955e4b7432707b2d728e480ce1e3a53faf94545ee34653a81eec
+  AGENTS.md#skillforge: sha256:11dabc305edeaef4e212e01e1aaa487d6aeba6e4f1791ec31f4307414b3e2dd8

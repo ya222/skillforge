@@ -98,6 +98,7 @@ params and marks the passages consumers are allowed to change. See
 | [`cloudflare-quick-tunnel`](skills/cloudflare-quick-tunnel/SKILL.md) | Put a local server on a public HTTPS URL with `cloudflared`, and know the limits |
 | [`claude-session-export`](skills/claude-session-export/SKILL.md) | Export a Claude Code session to Markdown with a script, without loading it into context |
 | [`obsidian-vault`](skills/obsidian-vault/SKILL.md) | Find, create and edit notes in a local Obsidian vault from any project |
+| [`deepseek-paraphrase`](skills/deepseek-paraphrase/SKILL.md) | Reword text with DeepSeek through a script, keeping meaning and structure |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text

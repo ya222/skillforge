@@ -20,6 +20,7 @@ skills:
   - from: ./skills/markdown-kanban
   - from: ./skills/cloudflare-quick-tunnel
   - from: ./skills/claude-session-export
+  - from: ./skills/deepseek-paraphrase
 
 targets:
   claude-code: {}
