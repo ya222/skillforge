@@ -1,0 +1,1126 @@
+<title>Live Flowchart</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<style>
+/* Layout: one screen. Tabs on top, a chart you can drag and zoom filling the middle, and a toolbar along the bottom. Only status gets color. */
+:root {
+  --bg: #ffffff; --surface: #f7f7f8; --ink: #18181b; --muted: #6b6b76; --line: #e2e2e6; --edge: #8f8f99;
+  --built: #15803d; --active: #2563eb; --failed: #dc2626; --stale: #b45309; --diff: #7e22ce;
+  --on-status: #ffffff; --shadow: rgba(24, 24, 27, .16); --dot: rgba(24, 24, 27, .16); --glass: rgba(255, 255, 255, .72);
+  --sans: "Geist", "Segoe UI", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101012; --surface: #19191c; --ink: #f4f4f5; --muted: #a1a1aa; --line: #2e2e33; --edge: #6e6e78;
+    --built: #4ade80; --active: #60a5fa; --failed: #f87171; --stale: #fbbf24; --diff: #c084fc;
+    --on-status: #101012; --shadow: rgba(0, 0, 0, .5); --dot: rgba(244, 244, 245, .13); --glass: rgba(25, 25, 28, .68); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101012; --surface: #19191c; --ink: #f4f4f5; --muted: #a1a1aa; --line: #2e2e33; --edge: #6e6e78;
+  --built: #4ade80; --active: #60a5fa; --failed: #f87171; --stale: #fbbf24; --diff: #c084fc;
+  --on-status: #101012; --shadow: rgba(0, 0, 0, .5); --dot: rgba(244, 244, 245, .13); --glass: rgba(25, 25, 28, .68); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 400 14px/1.45 var(--sans); }
+.app { display: flex; flex-direction: column; height: 100%; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; border-bottom: 1px solid var(--line); }
+.project { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; padding-block: 6px; min-width: 0; }
+.project strong { font-size: .9rem; font-weight: 600; }
+.branch { font: 400 .74rem var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.tabs-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
+.add-diagram { min-width: 24px; min-height: 24px; padding: 0 6px; font: inherit; font-size: 1rem; line-height: 1; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.add-diagram:hover { color: var(--ink); background: var(--surface); }
+.add-diagram[hidden], .drawing[hidden] { display: none; }
+.drawing { padding: 1px 7px; font-size: .74rem; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; }
+.chart-note { color: var(--stale); }
+.chart-note[hidden] { display: none; }
+.agent { display: inline-flex; align-items: center; gap: 6px; padding: 1px 9px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; color: var(--ink); font-size: .76rem; }
+.agent-word { color: var(--muted); }
+.agent-mark { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--edge); }
+.agent-mark.working { border-color: var(--active); border-right-color: transparent; animation: spin 1.1s linear infinite; }
+.agent-mark.done { background: var(--built); border-color: var(--built); }
+.agent-mark.blocked { background: var(--failed); border-color: var(--failed); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; margin-left: auto; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; min-width: 0; }
+.tabs:empty { display: none; }
+.tab { font: inherit; font-size: .82rem; font-weight: 500; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 6px 8px; cursor: pointer; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.stage { --side-width: min(340px, calc(100% - 20px)); position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; cursor: grab; user-select: none; background-color: var(--bg); background-image: radial-gradient(circle, var(--dot) 1.1px, transparent 1.5px); }
+.stage.panning { cursor: grabbing; }
+.canvas { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.canvas svg { position: absolute; inset: 0; overflow: visible; }
+.dimmable { transition: opacity .16s; }
+.dim { opacity: .24; }
+.group rect { fill: none; stroke: var(--line); stroke-width: 1; }
+.group-label { position: absolute; display: flex; gap: 4px; align-items: center; transform: translateY(-50%); padding: 0 6px; background: var(--bg); border: 0; font: inherit; font-size: .74rem; font-weight: 500; color: var(--muted); white-space: nowrap; cursor: pointer; }
+.group-label:hover { color: var(--ink); }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.25; }
+.edge.dashed { stroke-dasharray: 5 4; }
+.edge.thick { stroke-width: 2.5; }
+.edge.planned { stroke: var(--line); stroke-dasharray: 3 4; }
+.edge.live { stroke: var(--active); stroke-width: 1.75; stroke-dasharray: 5 5; animation: run 1s linear infinite; }
+.edge.lit { stroke: var(--ink); stroke-width: 2; }
+.arrow-normal { fill: var(--edge); } .arrow-planned { fill: var(--line); } .arrow-live { fill: var(--active); } .arrow-lit { fill: var(--ink); }
+@keyframes run { to { stroke-dashoffset: -10; } }
+.edge-label { position: absolute; transform: translate(-50%, -50%); padding: 0 4px; background: var(--bg); color: var(--muted); font-size: .72rem; line-height: 1.3; white-space: nowrap; pointer-events: none; }
+.shape path { fill: var(--surface); stroke: var(--edge); stroke-width: 1.25; transition: stroke .2s; }
+.shape path.rim { fill: none; }
+.shape.planned path { fill: var(--bg); stroke-dasharray: 4 4; }
+.shape.changed path { stroke: var(--built); }
+.shape.active path { stroke: var(--active); stroke-width: 1.75; }
+.shape.current path { stroke-width: 2.5; }
+.shape.failed path { stroke: var(--failed); stroke-width: 1.75; }
+.shape.differs path { stroke: var(--diff); stroke-width: 2; }
+.shape.selected path { stroke-width: 2.5; }
+.shape.selected:not(.active):not(.failed):not(.changed):not(.differs) path { stroke: var(--ink); }
+.shape.folded path { stroke-width: 2; }
+.step {
+  position: absolute; display: grid; gap: 0; align-content: center; justify-items: center;
+  padding: 2px 10px; text-align: center; font: inherit; color: var(--ink); cursor: pointer;
+  background: transparent; border: 0;
+}
+.step.table { padding-top: 14px; }
+.step.io { padding-inline: 22px; }
+.step:hover .step-title { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.step-title { font-weight: 500; font-size: .82rem; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.step-sub { max-width: 100%; font-size: .7rem; line-height: 1.2; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.step.planned .step-title { color: var(--muted); }
+.step.failed .step-sub { color: var(--failed); }
+.badge { position: absolute; top: -7px; right: -7px; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font: 500 10px/1 var(--mono); background: var(--bg); border: 1.5px solid var(--edge); }
+.badge[hidden], .tag[hidden] { display: none; }
+.step.decision .badge { top: 16%; right: 22%; }
+.step.io .badge { right: 2px; }
+.step.table .badge { top: -4px; }
+.badge.verified { background: var(--built); border-color: var(--built); color: var(--on-status); }
+.badge.claimed { border-color: var(--built); color: var(--built); }
+.badge.active { border-color: var(--active); border-right-color: transparent; animation: spin 1.1s linear infinite; }
+.badge.failed { background: var(--failed); border-color: var(--failed); color: var(--on-status); }
+.tag { position: absolute; top: -8px; left: 8px; padding: 0 5px; border-radius: 4px; background: var(--diff); color: var(--on-status); font-size: .64rem; font-weight: 600; line-height: 1.4; }
+.step.decision .tag { top: 14%; left: 18%; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 40px; padding-block: 4px; border-top: 1px solid var(--line); font-size: .8rem; }
+.picked { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-width: 0; flex: 1 1 280px; }
+.hint { color: var(--muted); }
+.picked-title { font-weight: 600; overflow-wrap: anywhere; }
+.picked-state { font-weight: 600; color: var(--muted); }
+.picked-state.changed { color: var(--built); } .picked-state.active { color: var(--active); }
+.picked-state.failed { color: var(--failed); }
+.picked-code { font: 400 .76rem var(--mono); color: var(--active); overflow-wrap: anywhere; }
+a.picked-code:hover { text-decoration: underline; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-left: auto; }
+.tool { min-height: 26px; min-width: 26px; padding: 2px 8px; font: inherit; font-size: .78rem; font-weight: 500; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.tool:hover { background: var(--surface); }
+.tool[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tool.primary { border-color: var(--edge); }
+.zoom { min-width: 42px; text-align: center; color: var(--muted); font-size: .76rem; font-variant-numeric: tabular-nums; }
+select.tool { max-width: 220px; }
+kbd { font: 500 .7rem var(--mono); padding: 0 4px; border: 1px solid var(--edge); border-radius: 3px; }
+.popover { position: absolute; z-index: 5; bottom: 8px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 24px)); max-height: calc(100% - 16px); overflow: auto; padding: 12px; display: grid; gap: 8px; background: var(--bg); border: 1px solid var(--edge); border-radius: 10px; box-shadow: 0 8px 28px var(--shadow); cursor: auto; user-select: text; font-size: .86rem; }
+.popover[hidden], .floating[hidden] { display: none; }
+.floating { position: absolute; top: max(10px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); width: var(--side-width); max-height: calc(100% - 20px); overflow: auto; padding: 12px; display: grid; gap: 8px; background: var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 10px; cursor: auto; user-select: text; font-size: .84rem; }
+.stage:has(.history-box:not([hidden])) .floating { max-height: calc(50% - 30px); }
+.floating h2 { margin: 0; font-size: .95rem; font-weight: 600; text-wrap: balance; }
+.floating p { margin: 0; }
+.floating .tool { justify-self: start; }
+.state-line { font-size: .78rem; font-weight: 600; color: var(--muted); }
+.state-line.changed { color: var(--built); } .state-line.active { color: var(--active); }
+.state-line.failed { color: var(--failed); }
+.popover.history-box { left: auto; right: max(10px, env(safe-area-inset-right, 0px)); bottom: 10px; transform: none; width: var(--side-width); max-height: 50%; background: var(--glass); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-color: var(--line); box-shadow: none; font-size: .84rem; }
+.popover h2 { margin: 0; font-size: .95rem; font-weight: 600; text-wrap: balance; }
+.popover p { margin: 0; }
+.eyebrow { font-size: .76rem; font-weight: 500; color: var(--muted); }
+dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; margin: 0; }
+dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.diff { max-height: 260px; }
+.diff span { display: block; }
+.diff .added { color: var(--built); }
+.diff .removed { color: var(--muted); }
+.diff .hunk { color: var(--diff); }
+.other-files { max-height: 240px; overflow: auto; }
+.other-files li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 4px; }
+dd.code { font: 400 .76rem/1.6 var(--mono); }
+dd.code a { color: var(--active); }
+pre { margin: 0; padding: 8px; max-height: 220px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font: 400 .74rem/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+.files li { font: 400 .76rem var(--mono); overflow-wrap: anywhere; }
+.log li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; overflow-wrap: anywhere; }
+.log time { font-size: .76rem; line-height: 1.6; color: var(--muted); font-variant-numeric: tabular-nums; }
+.request-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.request-to { margin-left: auto; font-size: .76rem; color: var(--muted); }
+.app { position: relative; }
+.request { bottom: 48px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chips:empty { display: none; }
+.chip { padding: 2px 8px; font: inherit; font-size: .76rem; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.chip:hover { background: var(--surface); }
+.request input { width: 100%; padding: 8px 10px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.request-note { min-height: 1.2em; font-size: .78rem; color: var(--muted); }
+.request-note.error { color: var(--failed); }
+.toast { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); padding: 4px 10px; background: var(--ink); color: var(--bg); border-radius: 6px; font-size: .8rem; }
+.toast[hidden] { display: none; }
+.empty { margin: auto; padding: 48px 16px; text-align: center; color: var(--muted); }
+.empty strong { display: block; color: var(--ink); font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+@media (max-width: 640px) { .hint { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .edge.live, .badge.active { animation: none; }
+  * { transition: none !important; }
+}
+</style>
+
+<div class="app">
+  <header class="gutter">
+    <div class="project"><strong id="topic">Live flowchart</strong><span class="branch" id="branch"></span></div>
+    <div class="tabs-row">
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <button class="add-diagram" id="new-diagram" type="button" aria-label="Ask for a new diagram" title="Ask for a new diagram" hidden>+</button>
+      <span class="drawing" id="drawing" hidden>Drawing…</span>
+    </div>
+    <div class="meta">
+      <span class="agent" id="agent" hidden title="From Claude's last update"><span class="agent-mark" id="agent-mark"></span><span id="agent-name"></span><span class="agent-word" id="agent-word"></span></span>
+      <span class="chart-note" id="chart-note" hidden>Chart may be out of date</span><span id="progress"></span><span id="age"></span>
+    </div>
+  </header>
+  <div class="empty" id="empty"><strong>Connecting</strong>Looking for diagrams in this project.</div>
+  <div class="stage" id="stage" hidden>
+    <div class="canvas" id="canvas"></div>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <section class="floating" id="details" aria-live="polite" hidden data-uncommentable></section>
+    <section class="popover history-box" id="history-panel" hidden data-uncommentable></section>
+  </div>
+  <form class="popover request" id="request" hidden data-uncommentable>
+    <div class="request-head">
+      <strong id="request-title"></strong>
+      <span class="picked-code" id="request-code"></span>
+      <span class="request-to" id="request-to"></span>
+    </div>
+    <div class="chips" id="request-chips"></div>
+    <input id="request-input" type="text" maxlength="2000" autocomplete="off" placeholder="What should change? For example, add rate limiting here" aria-label="What should change">
+    <div class="request-note" id="request-note" role="status"></div>
+  </form>
+  <footer class="toolbar gutter" id="toolbar" hidden>
+    <div class="picked" id="picked"></div>
+    <div class="tools">
+      <label id="compare-wrap" hidden><span class="eyebrow">Changes </span><select class="tool" id="compare" aria-label="Show changes since a commit"></select></label>
+      <button class="tool" id="history" type="button" aria-pressed="false">History</button>
+      <button class="tool" id="fit" type="button" title="Fit the chart (F)">Fit</button>
+      <button class="tool" id="zoom-out" type="button" aria-label="Zoom out" title="Zoom out (-)">−</button>
+      <span class="zoom" id="zoom-value">100%</span>
+      <button class="tool" id="zoom-in" type="button" aria-label="Zoom in" title="Zoom in (=)">+</button>
+    </div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const SCHEMA = 3;
+const CHAR_WIDTH = 6.6, LINE_CHARS = 30;
+const KIND_NAMES = { box: "Code", terminal: "Entry or exit", decision: "Branch", table: "Database table", io: "Input or output", folded: "Group" };
+const QUIET_MS = 5 * 60 * 1000;
+const LOADING_MS = 10000;
+const MIN_ZOOM = 0.2, MAX_ZOOM = 3, READABLE_ZOOM = 0.72;
+const FLIP_GAIN = 1.2;
+const SEVERITY = ["failed", "active", "planned", "built"];
+const COLLAPSED_KEY = "live-flowchart-collapsed";
+const DRAWING_MS = 10 * 60 * 1000;
+const SUGGESTIONS = ["The data model", "The API request flow", "The whole project's structure", "This feature in detail: "];
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, props = {}, ...children) => {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children);
+  return node;
+};
+const view = {
+  diagrams: [], chosen: null, pinned: false, selected: null, structure: "", edges: [], parts: new Map(), labels: [], size: { width: 0, height: 0 },
+  seen: new Set(), comments: null, views: {}, popover: null, compare: {}, drag: null, dragged: false, collapsed: readCollapsed(),
+};
+
+function readCollapsed() {
+  try { return JSON.parse(localStorage.getItem(COLLAPSED_KEY)) || {}; } catch { return {}; }
+}
+function saveCollapsed() {
+  try { localStorage.setItem(COLLAPSED_KEY, JSON.stringify(view.collapsed)); } catch { /* Folding still works for this visit. */ }
+}
+
+function duration(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  if (s < 60) return `${s}s`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, "0")}s`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ${String(Math.floor(s / 60) % 60).padStart(2, "0")}m`;
+  return `${Math.floor(s / 86400)}d`;
+}
+const clock = (iso) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+const since = (iso) => Date.now() - new Date(iso).getTime();
+const stateOf = (node) => node.status;
+
+function currentDiagram() {
+  return view.diagrams.find((item) => item.id === view.chosen) || view.diagrams[0] || null;
+}
+
+function showEmpty(heading, text) {
+  $("stage").hidden = true;
+  $("toolbar").hidden = true;
+  $("empty").hidden = false;
+  $("empty").replaceChildren(el("strong", { textContent: heading }), text);
+}
+
+/* What's on screen: every box, except that a folded group stands in for everything inside it. */
+function visibleChart(diagram) {
+  const collapsed = view.collapsed[diagram.id] || [];
+  const groups = new Map(diagram.groups.map((group) => [group.id, group]));
+  const outermostFolded = (groupId) => {
+    let found = null;
+    for (let id = groupId; id; id = groups.get(id)?.parent) if (collapsed.includes(id)) found = id;
+    return found;
+  };
+  const standIn = new Map(diagram.nodes.map((node) => {
+    const folded = outermostFolded(node.group);
+    return [node.id, folded ? `group:${folded}` : node.id];
+  }));
+  const folded = new Map();
+  diagram.nodes.forEach((node) => {
+    const id = standIn.get(node.id);
+    if (id === node.id) return;
+    if (!folded.has(id)) folded.set(id, []);
+    folded.get(id).push(node);
+  });
+  const items = diagram.nodes.filter((node) => standIn.get(node.id) === node.id).map((node) => ({ id: node.id, node, shape: node.shape, title: node.title, sub: node.sub, group: node.group, members: [node] }));
+  folded.forEach((members, id) => {
+    const group = groups.get(id.slice(6));
+    items.push({ id, node: null, shape: "folded", title: group.title, sub: `${members.length} boxes`, group: group.parent && !outermostFolded(group.parent) ? group.parent : null, groupId: group.id, members });
+  });
+  const seen = new Set();
+  const edges = [];
+  diagram.edges.forEach((edge) => {
+    const from = standIn.get(edge.from), to = standIn.get(edge.to);
+    if (from === to) return;
+    const key = `${from}>${to}`;
+    if (seen.has(key)) {
+      const first = edges.find((item) => item.from === from && item.to === to);
+      if (first.label !== edge.label) first.label = null;
+      return;
+    }
+    seen.add(key);
+    edges.push({ from, to, label: edge.label, style: edge.style });
+  });
+  const holdsItems = (id) => items.some((item) => item.group === id) || diagram.groups.some((group) => group.parent === id && shownGroup(group));
+  const shownGroup = (group) => !outermostFolded(group.id) && holdsItems(group.id);
+  return { items, edges, groups: diagram.groups.filter(shownGroup), standIn };
+}
+
+/* Each box fits its label, so short names take little room. Only the label decides the size, so a status change never moves anything. */
+function boxSize(item) {
+  const chars = item.title.length + (item.shape === "folded" ? 2 : 0);
+  const wrapped = chars > LINE_CHARS;
+  const text = (wrapped ? LINE_CHARS : Math.max(chars, item.sub ? item.sub.length * 0.85 : 0)) * CHAR_WIDTH;
+  const extra = wrapped ? 15 : 0;
+  if (item.shape === "terminal") return [Math.max(84, text + 34), 30 + extra];
+  if (item.shape === "decision") return [Math.max(150, text * 1.45 + 44), 72 + extra * 2];
+  if (item.shape === "table") return [Math.max(112, text + 34), 58 + extra];
+  if (item.shape === "io") return [Math.max(124, text + 58), 40 + extra];
+  return [Math.max(112, text + 26), 40 + extra];
+}
+
+function layoutGraph(chart, direction) {
+  const graph = new dagre.graphlib.Graph({ compound: true, multigraph: true });
+  graph.setGraph({ rankdir: direction, nodesep: 18, ranksep: 24, edgesep: 10, marginx: 12, marginy: 16 });
+  graph.setDefaultEdgeLabel(() => ({}));
+  chart.groups.forEach((group) => graph.setNode(group.id, { label: group.title, clusterLabelPos: "top" }));
+  chart.groups.forEach((group) => { if (group.parent && chart.groups.some((item) => item.id === group.parent)) graph.setParent(group.id, group.parent); });
+  chart.items.forEach((item) => {
+    const [width, height] = boxSize(item);
+    graph.setNode(item.id, { width, height });
+    if (item.group) graph.setParent(item.id, item.group);
+  });
+  chart.edges.forEach((edge, index) => {
+    const label = edge.label ? { label: edge.label, width: edge.label.length * 6 + 10, height: 14, labelpos: "c" } : {};
+    graph.setEdge(edge.from, edge.to, label, String(index));
+  });
+  dagre.layout(graph);
+  return graph;
+}
+
+function shapePath(shape, w, h) {
+  if (shape === "decision") return [`M${w / 2} 0L${w} ${h / 2}L${w / 2} ${h}L0 ${h / 2}Z`];
+  if (shape === "io") return [`M18 0H${w}L${w - 18} ${h}H0Z`];
+  if (shape === "table") {
+    const rx = w / 2;
+    return [`M0 12A${rx} 12 0 0 1 ${w} 12V${h - 12}A${rx} 12 0 0 1 0 ${h - 12}Z`, `M0 12A${rx} 12 0 0 0 ${w} 12`];
+  }
+  if (shape === "terminal") {
+    const r = h / 2;
+    return [`M${r} 0H${w - r}A${r} ${r} 0 0 1 ${w - r} ${h}H${r}A${r} ${r} 0 0 1 ${r} 0Z`];
+  }
+  return [`M4 0H${w - 4}Q${w} 0 ${w} 4V${h - 4}Q${w} ${h} ${w - 4} ${h}H4Q0 ${h} 0 ${h - 4}V4Q0 0 4 0Z`];
+}
+
+function edgePath(points) {
+  let d = `M${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const mid = { x: (points[i].x + points[i + 1].x) / 2, y: (points[i].y + points[i + 1].y) / 2 };
+    d += ` Q${points[i].x} ${points[i].y} ${mid.x} ${mid.y}`;
+  }
+  const last = points[points.length - 1];
+  return `${d} L${last.x} ${last.y}`;
+}
+
+const isLoop = (from, to, direction) => (direction === "LR" ? from.x >= to.x : from.y >= to.y);
+
+/* Forward arrows meet a diamond at its tips, because dagre aims for the bounding box. A loop runs around the side of the chart, clear of the boxes it passes. */
+function edgePoints(graph, shapes, edge, direction) {
+  const from = graph.node(edge.v), to = graph.node(edge.w);
+  const across = direction === "LR";
+  if (isLoop(from, to, direction)) {
+    const boxes = [...shapes.keys()].map((id) => graph.node(id));
+    if (across) {
+      const left = to.x - to.width / 2, right = from.x + from.width / 2;
+      const passed = boxes.filter((box) => box.x + box.width / 2 >= left && box.x - box.width / 2 <= right);
+      const lane = Math.max(...passed.map((box) => box.y + box.height / 2)) + 22;
+      return [{ x: from.x, y: from.y + from.height / 2 }, { x: from.x, y: lane }, { x: to.x, y: lane }, { x: to.x, y: to.y + to.height / 2 }];
+    }
+    const top = to.y - to.height / 2, bottom = from.y + from.height / 2;
+    const passed = boxes.filter((box) => box.y + box.height / 2 >= top && box.y - box.height / 2 <= bottom);
+    const lane = Math.max(...passed.map((box) => box.x + box.width / 2)) + 22;
+    return [{ x: from.x + from.width / 2, y: from.y }, { x: lane, y: from.y }, { x: lane, y: to.y }, { x: to.x + to.width / 2, y: to.y }];
+  }
+  const points = graph.edge(edge).points.map((point) => ({ ...point }));
+  if (shapes.get(edge.v) === "decision") {
+    const start = across ? [{ x: from.x + from.width / 2, y: from.y }, { x: from.x + from.width / 2 + 8, y: from.y }] : [{ x: from.x, y: from.y + from.height / 2 }, { x: from.x, y: from.y + from.height / 2 + 8 }];
+    points.splice(0, 1, ...start);
+  }
+  if (shapes.get(edge.w) === "decision") {
+    const end = across ? [{ x: to.x - to.width / 2 - 8, y: to.y }, { x: to.x - to.width / 2, y: to.y }] : [{ x: to.x, y: to.y - to.height / 2 - 8 }, { x: to.x, y: to.y - to.height / 2 }];
+    points.splice(points.length - 1, 1, ...end);
+  }
+  return points;
+}
+
+/* Top to bottom by default. A chart turns sideways only when that lets it fit the screen at least 20% larger. */
+function pickDirection(layouts) {
+  const { width, height } = stageSize();
+  const fit = (graph) => Math.min(1, width / graph.graph().width, height / graph.graph().height);
+  return fit(layouts.LR) >= fit(layouts.TB) * FLIP_GAIN ? "LR" : "TB";
+}
+
+function toggleGroup(diagram, groupId) {
+  const list = view.collapsed[diagram.id] || [];
+  view.collapsed[diagram.id] = list.includes(groupId) ? list.filter((id) => id !== groupId) : [...list, groupId];
+  saveCollapsed();
+  view.selected = null;
+  render();
+}
+
+/* Positions depend only on the chart's structure, so a status change never moves a box. */
+function buildCanvas(diagram, chart) {
+  const base = JSON.stringify([diagram.id, chart.groups, chart.edges, chart.items.map((item) => [item.id, item.shape, item.group, item.title, item.sub])]);
+  if (base !== view.base) {
+    view.base = base;
+    view.layouts = { TB: layoutGraph(chart, "TB"), LR: layoutGraph(chart, "LR") };
+  }
+  const direction = pickDirection(view.layouts);
+  const structure = `${direction}${base}`;
+  if (structure === view.structure) return;
+  const turned = view.direction && view.direction !== direction;
+  view.structure = structure;
+  view.direction = direction;
+  const graph = view.layouts[direction];
+  const { width, height } = graph.graph();
+  view.size = { width, height };
+  const canvas = $("canvas");
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  const ns = "http://www.w3.org/2000/svg";
+  const make = (tag, attributes = {}) => {
+    const node = document.createElementNS(ns, tag);
+    Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
+    return node;
+  };
+  const svg = make("svg", { width, height, "aria-hidden": "true" });
+  const defs = make("defs");
+  ["normal", "planned", "live", "lit"].forEach((kind) => {
+    const marker = make("marker", { id: `arrow-${kind}`, viewBox: "0 0 8 8", refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: "auto" });
+    marker.append(make("path", { d: "M0 0 L8 4 L0 8 Z", class: `arrow-${kind}` }));
+    defs.append(marker);
+  });
+  svg.append(defs);
+  const overlays = [];
+  chart.groups.forEach((group) => {
+    const box = graph.node(group.id);
+    const left = box.x - box.width / 2, top = box.y - box.height / 2;
+    const frame = make("g", { class: "group" });
+    frame.append(make("rect", { x: left, y: top, width: box.width, height: box.height, rx: 8 }));
+    svg.append(frame);
+    const label = el("button", { type: "button", className: "group-label", textContent: `▾ ${group.title}`, title: "Fold this group" });
+    label.style.left = `${left + 10}px`;
+    label.style.top = `${top}px`;
+    label.addEventListener("click", () => { if (!view.dragged) toggleGroup(diagram, group.id); });
+    overlays.push(label);
+  });
+  const shapes = new Map(chart.items.map((item) => [item.id, item.shape]));
+  view.edges = graph.edges().map((edge) => {
+    const points = edgePoints(graph, shapes, edge, direction);
+    const path = make("path", { d: edgePath(points), class: "dimmable" });
+    svg.append(path);
+    const info = graph.edge(edge);
+    let label = null;
+    if (info.label) {
+      label = el("span", { className: "edge-label dimmable", textContent: info.label });
+      const looped = isLoop(graph.node(edge.v), graph.node(edge.w), direction);
+      label.style.left = `${looped ? (points[1].x + points[2].x) / 2 : info.x}px`;
+      label.style.top = `${looped ? (points[1].y + points[2].y) / 2 : info.y}px`;
+      overlays.push(label);
+    }
+    return { from: edge.v, to: edge.w, path, label, style: chart.edges[Number(edge.name)].style };
+  });
+  view.parts = new Map();
+  canvas.replaceChildren(svg);
+  chart.items.forEach((item) => {
+    const box = graph.node(item.id);
+    const left = box.x - box.width / 2, top = box.y - box.height / 2;
+    const group = make("g", { transform: `translate(${left} ${top})` });
+    shapePath(item.shape, box.width, box.height).forEach((d, i) => group.append(make("path", i ? { d, class: "rim" } : { d })));
+    svg.append(group);
+    const button = el("button", { type: "button", className: "step" });
+    Object.assign(button.style, { left: `${left}px`, top: `${top}px`, width: `${box.width}px`, height: `${box.height}px` });
+    if (item.shape === "decision") button.style.paddingInline = `${Math.round(box.width * 0.2)}px`;
+    button.dataset.commentTarget = `box-${item.id}`;
+    const title = el("span", { className: "step-title" });
+    const sub = el("span", { className: "step-sub" });
+    const badge = el("span", { className: "badge", hidden: true });
+    const tag = el("span", { className: "tag", hidden: true });
+    button.append(title, sub, badge, tag);
+    button.addEventListener("click", () => {
+      if (view.dragged) return;
+      if (item.shape === "folded") { toggleGroup(diagram, item.groupId); return; }
+      view.selected = view.selected === item.id ? null : item.id;
+      render();
+    });
+    canvas.append(button);
+    view.parts.set(item.id, { button, group, title, sub, badge, tag });
+  });
+  canvas.append(...overlays);
+  const saved = view.views[diagram.id];
+  if (!saved || !saved.moved || turned) startView(diagram.id);
+}
+
+function stageSize() {
+  const stage = $("stage");
+  return { width: stage.clientWidth, height: stage.clientHeight };
+}
+
+/* Opens at a readable size from the top of the chart when it can't all fit. Fit always shows everything. */
+function startView(id) {
+  const { width, height } = stageSize();
+  const fit = Math.min(1, width / view.size.width, height / view.size.height);
+  const z = Math.max(fit, READABLE_ZOOM);
+  const place = (room, size) => (size * z > room ? 0 : (room - size * z) / 2);
+  view.views[id] = { z, x: place(width, view.size.width), y: place(height, view.size.height), moved: false };
+  applyView(id);
+}
+
+function fitView(id) {
+  const { width, height } = stageSize();
+  const z = Math.max(MIN_ZOOM, Math.min(1, width / view.size.width, height / view.size.height));
+  view.views[id] = { z, x: (width - view.size.width * z) / 2, y: (height - view.size.height * z) / 2, moved: true };
+  applyView(id);
+}
+
+function zoomAt(id, factor, cx, cy) {
+  const current = view.views[id];
+  const z = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, current.z * factor));
+  const scale = z / current.z;
+  view.views[id] = { z, x: cx - (cx - current.x) * scale, y: cy - (cy - current.y) * scale, moved: true };
+  applyView(id);
+}
+
+function applyView(id) {
+  const { z, x, y } = view.views[id];
+  $("canvas").style.transform = `translate(${x}px, ${y}px) scale(${z})`;
+  /* The dots move with the chart and stay evenly spaced at every zoom. */
+  let spacing = 20 * z;
+  while (spacing < 12) spacing *= 2;
+  while (spacing > 40) spacing /= 2;
+  const stage = $("stage");
+  stage.style.backgroundSize = `${spacing}px ${spacing}px`;
+  stage.style.backgroundPosition = `${x}px ${y}px`;
+  $("zoom-value").textContent = `${Math.round(z * 100)}%`;
+}
+
+function subtitle(item) {
+  if (item.shape === "folded") {
+    const counts = {};
+    item.members.forEach((node) => { const state = stateOf(node); counts[state] = (counts[state] || 0) + 1; });
+    const notes = [["active", "being built"], ["failed", "failed"], ["planned", "planned"]]
+      .filter(([state]) => counts[state]).map(([state, label]) => `${counts[state]} ${label}`);
+    return notes.join(" · ") || item.sub;
+  }
+  const node = item.node;
+  if (node.status === "active") {
+    const who = node.agent ? ` · ${node.agent}` : "";
+    const quiet = since(node.lastEventAt) > QUIET_MS ? " · quiet" : "";
+    return `${duration(since(node.startedAt))}${who}${quiet}`;
+  }
+  if (node.status === "failed" || node.status === "planned") return stateLabel(node);
+  return node.sub || "";
+}
+
+function stateLabel(node) {
+  if (node.status === "active") return "Being built";
+  if (node.status === "planned") return "Planned";
+  if (node.status === "failed") return "Failed";
+  if (node.result === "verified") return "Built, check passed";
+  if (node.result === "claimed") return "Built, no check";
+  return "Built";
+}
+
+function worstState(item) {
+  const states = item.members.map(stateOf);
+  return SEVERITY.find((state) => states.includes(state)) || "built";
+}
+
+function updateBadge(badge, item) {
+  const state = worstState(item);
+  let kind = null, glyph = "";
+  if (state === "failed") { kind = "failed"; glyph = "×"; }
+  else if (state === "active") kind = "active";
+  else if (item.node && item.node.status === "built" && item.node.result) { kind = item.node.result; glyph = "✓"; }
+  badge.hidden = !kind;
+  badge.className = `badge ${kind || ""}`;
+  badge.textContent = glyph;
+}
+
+/* Clicking a box lights everything that leads to it and everything it leads to. */
+function connected(chart, id) {
+  const walk = (start, key, other) => {
+    const reached = new Set([start]);
+    const queue = [start];
+    while (queue.length) {
+      const current = queue.pop();
+      chart.edges.forEach((edge) => {
+        if (edge[key] === current && !reached.has(edge[other])) {
+          reached.add(edge[other]);
+          queue.push(edge[other]);
+        }
+      });
+    }
+    return reached;
+  };
+  return { down: walk(id, "from", "to"), up: walk(id, "to", "from") };
+}
+
+function comparison(diagram) {
+  const commit = view.compare[diagram.id];
+  return (diagram.comparisons || []).find((item) => item.commit === commit) || null;
+}
+
+function differsFrom(item, compared) {
+  if (!compared) return null;
+  const states = item.members.map((node) => compared.states[node.id]).filter(Boolean);
+  return states.includes("added") ? "added" : states.length ? "changed" : null;
+}
+
+function updateCanvas(diagram, chart, selected) {
+  const items = new Map(chart.items.map((item) => [item.id, item]));
+  const lit = selected ? connected(chart, selected) : null;
+  const compared = comparison(diagram);
+  const onFlow = (id) => !lit || lit.down.has(id) || lit.up.has(id);
+  chart.items.forEach((item) => {
+    const parts = view.parts.get(item.id);
+    const state = worstState(item);
+    const differs = differsFrom(item, compared);
+    const changed = item.node && item.node.status === "built" && item.node.result;
+    const dim = !onFlow(item.id) || (compared && !differs);
+    parts.button.className = `step dimmable ${item.shape} ${state}${dim ? " dim" : ""}`;
+    parts.group.setAttribute("class", `shape dimmable ${state}${changed ? " changed" : ""}${item.node?.current ? " current" : ""}${selected === item.id ? " selected" : ""}${differs ? " differs" : ""}${item.shape === "folded" ? " folded" : ""}${dim ? " dim" : ""}`);
+    parts.button.setAttribute("aria-pressed", String(selected === item.id));
+    parts.button.setAttribute("aria-label", item.node ? `${KIND_NAMES[item.shape]}: ${item.title}, ${stateLabel(item.node)}` : `Group ${item.title}, ${item.sub}. Unfold`);
+    parts.title.textContent = item.shape === "folded" ? `▸ ${item.title}` : item.title;
+    const sub = subtitle(item);
+    parts.sub.textContent = sub;
+    parts.sub.hidden = !sub;
+    updateBadge(parts.badge, item);
+    parts.tag.hidden = !differs;
+    parts.tag.textContent = differs === "added" ? "New" : "Changed";
+  });
+  view.edges.forEach(({ from, to, path, label, style }) => {
+    const source = items.get(from), target = items.get(to);
+    const onPath = lit && ((lit.down.has(from) && lit.down.has(to)) || (lit.up.has(from) && lit.up.has(to)));
+    const planned = worstState(source) === "planned" || worstState(target) === "planned";
+    const kind = onPath ? "lit" : worstState(target) === "active" ? "live" : planned ? "planned" : "normal";
+    const dim = (lit && !onPath) || (compared && !(differsFrom(source, compared) && differsFrom(target, compared)));
+    path.setAttribute("class", `edge dimmable ${kind === "normal" ? style : kind}${dim ? " dim" : ""}`);
+    path.setAttribute("marker-end", `url(#arrow-${kind})`);
+    if (label) label.classList.toggle("dim", Boolean(dim));
+  });
+}
+
+/* What the agent is doing, read from the chart, because the page only learns anything when Claude pushes. */
+function agentStatus() {
+  const nodes = view.diagrams.flatMap((diagram) => diagram.nodes);
+  const worked = nodes.filter((node) => node.startedAt).sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+  const active = worked.filter((node) => node.status === "active");
+  if (active.length) return { word: "working", name: (active.find((node) => node.current) || active[0]).agent || "Claude" };
+  const name = worked[0]?.agent || "Claude";
+  if (nodes.some((node) => node.status === "failed")) return { word: "blocked", name };
+  if (nodes.some((node) => node.status === "planned") || !worked.length) return { word: "idle", name };
+  return { word: "done", name };
+}
+
+function updateAgent() {
+  const { word, name } = agentStatus();
+  $("agent").hidden = false;
+  $("agent-mark").className = `agent-mark ${word}`;
+  $("agent-name").textContent = name;
+  $("agent-word").textContent = word;
+}
+
+function updateHeader(diagram) {
+  $("topic").textContent = diagram.topic || diagram.root?.split("/").pop() || "Live flowchart";
+  $("branch").textContent = diagram.branch || "";
+  updateAgent();
+  const count = (test) => diagram.nodes.filter(test).length;
+  const parts = [];
+  const add = (number, label) => { if (number) parts.push(`${number} ${label}`); };
+  add(count((node) => node.status === "active"), "being built");
+  add(count((node) => node.status === "planned"), "planned");
+  add(count((node) => node.status === "failed"), "failed");
+  $("progress").textContent = parts.join(" · ");
+  $("chart-note").hidden = !diagram.nodes.some((node) => node.stale || node.broken);
+  $("age").textContent = `Updated ${duration(since(diagram.updatedAt))} ago`;
+}
+
+function chooseDiagram(id) {
+  view.chosen = id;
+  view.pinned = true;
+  view.selected = null;
+  closePopover();
+  render();
+}
+
+function updateTabs(diagram) {
+  const signature = JSON.stringify([diagram.id, view.diagrams.map((item) => [item.id, item.title])]);
+  if (signature === view.tabSignature) return;
+  view.tabSignature = signature;
+  $("tabs").replaceChildren(...view.diagrams.map((item) => {
+    const tab = el("button", { type: "button", className: "tab", textContent: item.title });
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-selected", String(item.id === diagram.id));
+    tab.addEventListener("click", () => chooseDiagram(item.id));
+    return tab;
+  }));
+}
+
+function codeLocation(node) {
+  if (node.resolved) {
+    const { path, line, symbol } = node.resolved;
+    return `${path}${line ? `:${line}` : ""}${symbol ? ` (${symbol})` : ""}`;
+  }
+  return node.ref ? `${node.ref} (not written yet)` : "";
+}
+
+function updateCompare(diagram) {
+  const list = diagram.comparisons || [];
+  $("compare-wrap").hidden = !list.length;
+  const signature = JSON.stringify([diagram.id, list.map((item) => [item.commit, item.auto])]);
+  if (signature !== view.compareSignature) {
+    view.compareSignature = signature;
+    $("compare").replaceChildren(el("option", { value: "", textContent: "Off" }),
+      ...list.map((item) => el("option", { value: item.commit, textContent: item.auto ? `Since this branch began (${item.short})` : `Since ${item.short}: ${item.subject}` })));
+  }
+  $("compare").value = comparison(diagram)?.commit || "";
+}
+
+/* Opens the box's code in VS Code. Browsers can refuse app links, so the path can also be copied. */
+function codeLink(diagram, node) {
+  const text = codeLocation(node);
+  if (!node.resolved || !diagram.root) return el("span", { className: "picked-code", textContent: text });
+  const { path, line } = node.resolved;
+  const href = `vscode://file${encodeURI(`${diagram.root}/${path}`)}${line ? `:${line}` : ""}`;
+  return el("a", { className: "picked-code", href, textContent: text, title: "Open in VS Code", target: "_blank", rel: "noopener" });
+}
+
+function updatePicked(diagram, chart, selected) {
+  const signature = JSON.stringify([selected, selected && chart.items.find((item) => item.id === selected)?.node, comparison(diagram)?.commit, diagram.root]);
+  if (signature === view.pickedSignature) return;
+  view.pickedSignature = signature;
+  const node = chart.items.find((item) => item.id === selected)?.node;
+  if (!node) {
+    const compared = comparison(diagram);
+    const text = compared
+      ? `${Object.keys(compared.states).length} boxes differ from ${compared.short}. Click one to see its lines.`
+      : "Click a box to light its flow · E to ask for a change · drag to move · ⌘/Ctrl scroll to zoom";
+    $("picked").replaceChildren(el("span", { className: "hint", textContent: text }));
+    return;
+  }
+  const state = el("span", { className: `picked-state ${stateOf(node)}${node.result ? " changed" : ""}`, textContent: stateLabel(node) });
+  const children = [el("span", { className: "picked-title", textContent: node.title }), state];
+  if (codeLocation(node)) children.push(codeLink(diagram, node));
+  if (view.comments) {
+    const ask = el("button", { type: "button", className: "tool primary" }, el("kbd", { textContent: "E" }), " Ask for a change");
+    ask.addEventListener("click", openRequest);
+    children.push(ask);
+  }
+  $("picked").replaceChildren(...children);
+}
+
+async function copyPath(diagram, node, button) {
+  const { path, line } = node.resolved;
+  const text = `${diagram.root}/${path}${line ? `:${line}` : ""}`;
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Copied the path");
+  } catch {
+    const input = el("input", { value: text, readOnly: true, ariaLabel: "Path to copy" });
+    button.replaceWith(input);
+    input.select();
+  }
+}
+
+function diffBlock(diff) {
+  const kind = (line) => (line.startsWith("@@") ? "hunk" : line.startsWith("+") ? "added" : line.startsWith("-") ? "removed" : "");
+  return el("pre", { className: "diff" }, ...diff.split("\n").map((line) => el("span", { className: kind(line), textContent: line || " " })));
+}
+
+function renderDetails(diagram, chart, selected) {
+  const node = chart.items.find((item) => item.id === selected)?.node;
+  const panel = $("details");
+  const compared = comparison(diagram);
+  const others = compared && !node && ((compared.files?.length || 0) + (compared.removed?.length || 0)) ? compared : null;
+  const signature = JSON.stringify([node, diagram.root, compared?.commit, compared?.diffs?.[node?.id], others]);
+  if (signature !== view.detailSignature) {
+    view.detailSignature = signature;
+    const content = [];
+    if (node) {
+      const rows = el("dl");
+      const row = (label, value) => { if (value) rows.append(el("dt", { textContent: label }), el("dd", { textContent: value })); };
+      row("Type", KIND_NAMES[node.shape]);
+      if (codeLocation(node)) rows.append(el("dt", { textContent: "Code" }), el("dd", { className: "code" }, codeLink(diagram, node)));
+      row("Agent", node.status === "active" || node.result ? node.agent : null);
+      row("Started", node.startedAt && clock(node.startedAt));
+      row("Finished", node.finishedAt && clock(node.finishedAt));
+      if (node.attempts > 1) row("Attempts", String(node.attempts));
+      content.push(el("span", { className: `state-line ${stateOf(node)}${node.result ? " changed" : ""}`, textContent: stateLabel(node) }), el("h2", { textContent: node.title }));
+      if (node.sub) content.push(el("p", { textContent: node.sub }));
+      content.push(rows);
+      if (node.resolved && diagram.root) {
+        const copy = el("button", { type: "button", className: "tool", textContent: "Copy path" });
+        copy.addEventListener("click", () => copyPath(diagram, node, copy));
+        content.push(copy);
+      }
+      if (node.stale || node.broken) content.push(el("p", { textContent: "This part of the chart may be out of date. The next Claude session checks it." }));
+      if (node.check && !node.checkResult) content.push(el("div", { className: "eyebrow", textContent: "Check" }), el("pre", { textContent: node.check }));
+      if (node.checkResult) {
+        const result = node.checkResult;
+        content.push(el("div", { className: "eyebrow", textContent: `Check exited ${result.exit} in ${result.seconds}s` }), el("pre", { textContent: `$ ${result.command}\n${result.tail}` }));
+      }
+      if (node.touched.length) {
+        content.push(el("div", { className: "eyebrow", textContent: "Files edited" }), el("ul", { className: "files" }, ...node.touched.map((file) => el("li", { textContent: file }))));
+      }
+      node.notes.slice(-5).forEach((note) => content.push(el("p", { textContent: `${clock(note.at)} ${note.text}` })));
+      const state = compared?.states[node.id];
+      if (state) {
+        content.push(el("div", { className: "eyebrow", textContent: `${state === "added" ? "New" : "Changed"} since ${compared.short}` }));
+        const diff = compared.diffs?.[node.id];
+        content.push(diff ? diffBlock(diff) : el("p", { textContent: "This change is too large to show here. Open the file to see it." }));
+      }
+    } else if (others) {
+      content.push(el("h2", { textContent: `Also changed since ${others.short}` }));
+      if (others.files.length) {
+        const more = others.filesTotal - others.files.length;
+        content.push(el("div", { className: "eyebrow", textContent: "Files no box covers" }),
+          el("ul", { className: "files other-files" }, ...others.files.map((file) => el("li", {}, el("span", { textContent: file.status }), el("span", { textContent: file.path })))));
+        if (more > 0) content.push(el("p", { textContent: `And ${more} more.` }));
+      }
+      if (others.removed.length) {
+        content.push(el("div", { className: "eyebrow", textContent: "Boxes removed from this chart" }),
+          el("ul", {}, ...others.removed.map((item) => el("li", { textContent: item.title }))));
+      }
+    }
+    panel.replaceChildren(...content);
+    panel.hidden = !content.length;
+  }
+  const history = $("history-panel");
+  const historySignature = JSON.stringify([view.popover, diagram.id, diagram.seq]);
+  if (historySignature !== view.historySignature) {
+    view.historySignature = historySignature;
+    const shown = diagram.events.slice(-14).reverse();
+    history.replaceChildren(el("h2", { textContent: "Recent changes" }), el("ul", { className: "log" }, ...shown.map((event) =>
+      el("li", {}, el("time", { textContent: clock(event.at) }), el("span", { textContent: event.text })))));
+  }
+  history.hidden = view.popover !== "history";
+  $("history").setAttribute("aria-pressed", String(view.popover === "history"));
+}
+
+function closePopover() {
+  view.popover = null;
+  $("request").hidden = true;
+}
+
+function togglePopover(name) {
+  view.popover = view.popover === name ? null : name;
+  $("request").hidden = true;
+  render();
+}
+
+function selectedNode(diagram) {
+  return diagram?.nodes.find((node) => node.id === view.selected) || null;
+}
+
+async function prepareRequest(mode, heading, code, placeholder, chips) {
+  view.requestMode = mode;
+  view.popover = null;
+  render();
+  $("request").hidden = false;
+  $("request-title").textContent = heading;
+  $("request-code").textContent = code;
+  $("request-input").placeholder = placeholder;
+  $("request-chips").replaceChildren(...chips.map((text) => {
+    const chip = el("button", { type: "button", className: "chip", textContent: text.replace(/: $/, "") });
+    chip.addEventListener("click", () => {
+      $("request-input").value = text;
+      $("request-input").focus();
+    });
+    return chip;
+  }));
+  $("request-note").textContent = "";
+  $("request-note").classList.remove("error");
+  $("request-input").focus();
+  const availability = await canSend();
+  view.canSend = availability === "available";
+  $("request-to").textContent = view.canSend ? "→ Claude" : "→ Comment";
+  const reasons = { writers_only: "Only editors can send to Claude, so this posts as a comment.", no_session: "No Claude session is listening, so this posts as a comment.", off: "Sending to Claude is off here, so this posts as a comment." };
+  $("request-note").textContent = view.canSend ? "Enter to send · Esc to cancel" : reasons[availability] || "Sending to Claude isn't available, so this posts as a comment.";
+}
+
+function openRequest() {
+  const node = selectedNode(currentDiagram());
+  if (!node || !view.comments) return;
+  prepareRequest("box", node.title, codeLocation(node), "What should change? For example, add rate limiting here", []);
+}
+
+function openNewDiagram() {
+  if (!view.comments) return;
+  prepareRequest("diagram", "New diagram", "", "What should it show?", SUGGESTIONS);
+}
+
+async function canSend() {
+  try {
+    return await view.comments.canSendToClaude();
+  } catch (error) {
+    return error.code || "off";
+  }
+}
+
+$("request").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const diagram = currentDiagram();
+  const asking = view.requestMode === "diagram";
+  const node = selectedNode(diagram);
+  const note = $("request-input").value.trim();
+  if (!note || (!asking && !node)) return;
+  const where = node ? codeLocation(node) : "";
+  const names = view.diagrams.map((item) => item.id).join(", ") || "none yet";
+  const text = asking
+    ? `From the flowchart page, please draw a new diagram: ${note}\nRead the code, then use flow.py draw under a new name. Existing diagrams, which you shouldn't overwrite: ${names}.`
+    : `In the flowchart "${diagram.title}" (diagram ${diagram.id}) I pointed at the box "${node.title}" (${node.id})${where ? `, ${where}` : ""}.\n${note}\nChange the code, run its check, and update the chart with flow.py.`;
+  const input = $("request-input");
+  input.disabled = true;
+  try {
+    const anchor = await view.comments.anchorFor(asking ? $("new-diagram") : view.parts.get(node.id).button);
+    if (view.canSend) await view.comments.sendToClaude({ anchor, text });
+    else await view.comments.create({ anchor, text });
+    input.value = "";
+    $("request").hidden = true;
+    if (asking) view.drawingSince = Date.now();
+    showToast(view.canSend ? "Sent to Claude" : "Posted as a comment");
+  } catch (error) {
+    const note = $("request-note");
+    note.classList.add("error");
+    note.textContent = error.code === "claude_unavailable"
+      ? "Claude couldn't receive this, so nothing was posted. Press Enter again to post it as a comment."
+      : `This wasn't sent, and your note is still here. ${error.message || error.code}`;
+    if (error.code === "claude_unavailable") {
+      view.canSend = false;
+      $("request-to").textContent = "→ Comment";
+    }
+  } finally {
+    input.disabled = false;
+    if (!$("request").hidden) input.focus();
+  }
+});
+
+let toastTimer = 0;
+function showToast(text) {
+  const toast = $("toast");
+  toast.textContent = text;
+  toast.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.hidden = true; }, 2600);
+}
+
+function render() {
+  if (!view.loaded) return;
+  $("new-diagram").hidden = !view.comments;
+  $("drawing").hidden = !view.drawingSince || Date.now() - view.drawingSince > DRAWING_MS;
+  const diagram = currentDiagram();
+  if (!diagram) {
+    showEmpty("No diagrams yet", "Press + to ask Claude for one. A chart appears here as soon as it's drawn.");
+    return;
+  }
+  if (diagram.schema > SCHEMA) {
+    showEmpty("This page needs an update", `This chart uses data format ${diagram.schema}, and this page reads up to format ${SCHEMA}. Ask Claude to republish the page.`);
+    return;
+  }
+  $("empty").hidden = true;
+  $("stage").hidden = false;
+  $("toolbar").hidden = false;
+  const chart = visibleChart(diagram);
+  buildCanvas(diagram, chart);
+  applyView(diagram.id);
+  const selected = chart.items.some((item) => item.id === view.selected) ? view.selected : null;
+  view.selected = selected;
+  updateTabs(diagram);
+  updateHeader(diagram);
+  updateCompare(diagram);
+  updateCanvas(diagram, chart, selected);
+  updatePicked(diagram, chart, selected);
+  renderDetails(diagram, chart, selected);
+}
+
+$("fit").addEventListener("click", () => { fitView(currentDiagram().id); });
+$("zoom-in").addEventListener("click", () => { const { width, height } = stageSize(); zoomAt(currentDiagram().id, 1.2, width / 2, height / 2); });
+$("zoom-out").addEventListener("click", () => { const { width, height } = stageSize(); zoomAt(currentDiagram().id, 1 / 1.2, width / 2, height / 2); });
+$("history").addEventListener("click", () => togglePopover("history"));
+$("new-diagram").addEventListener("click", openNewDiagram);
+$("compare").addEventListener("change", (event) => {
+  view.compare[currentDiagram().id] = event.target.value;
+  render();
+});
+
+const stage = $("stage");
+const inPanel = (target) => target.closest(".popover, .floating");
+stage.addEventListener("pointerdown", (event) => {
+  if (inPanel(event.target) || event.button !== 0) return;
+  const id = currentDiagram().id;
+  view.drag = { id, startX: event.clientX, startY: event.clientY, x: view.views[id].x, y: view.views[id].y, moved: false, pointer: event.pointerId };
+  view.dragged = false;
+});
+stage.addEventListener("pointermove", (event) => {
+  const drag = view.drag;
+  if (!drag) return;
+  const dx = event.clientX - drag.startX, dy = event.clientY - drag.startY;
+  if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+  if (!drag.moved) {
+    drag.moved = true;
+    stage.classList.add("panning");
+    stage.setPointerCapture(drag.pointer);
+  }
+  view.views[drag.id] = { ...view.views[drag.id], x: drag.x + dx, y: drag.y + dy, moved: true };
+  applyView(drag.id);
+});
+const endDrag = () => {
+  if (view.drag?.moved) view.dragged = true;
+  view.drag = null;
+  stage.classList.remove("panning");
+};
+stage.addEventListener("pointerup", endDrag);
+stage.addEventListener("pointercancel", endDrag);
+stage.addEventListener("click", (event) => {
+  if (view.dragged) { view.dragged = false; return; }
+  if (event.target.closest("button, .popover, .floating")) return;
+  view.selected = null;
+  closePopover();
+  render();
+});
+stage.addEventListener("wheel", (event) => {
+  if (inPanel(event.target)) return;
+  event.preventDefault();
+  const id = currentDiagram().id;
+  if (event.ctrlKey || event.metaKey) {
+    const rect = stage.getBoundingClientRect();
+    zoomAt(id, Math.exp(-event.deltaY * 0.002), event.clientX - rect.left, event.clientY - rect.top);
+  } else {
+    const current = view.views[id];
+    view.views[id] = { ...current, x: current.x - event.deltaX, y: current.y - event.deltaY, moved: true };
+    applyView(id);
+  }
+}, { passive: false });
+
+document.addEventListener("keydown", (event) => {
+  if (event.target.matches("input, select, textarea")) {
+    if (event.key === "Escape") { $("request").hidden = true; render(); }
+    return;
+  }
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  const diagram = currentDiagram();
+  if (!diagram || !view.views[diagram.id]) return;
+  const { width, height } = stageSize();
+  const key = event.key.toLowerCase();
+  if (key === "e") { event.preventDefault(); openRequest(); }
+  else if (key === "f") fitView(diagram.id);
+  else if (key === "0") zoomAt(diagram.id, 1 / view.views[diagram.id].z, width / 2, height / 2);
+  else if (key === "=" || key === "+") zoomAt(diagram.id, 1.2, width / 2, height / 2);
+  else if (key === "-") zoomAt(diagram.id, 1 / 1.2, width / 2, height / 2);
+  else if (/^[1-9]$/.test(key) && view.diagrams[Number(key) - 1]) chooseDiagram(view.diagrams[Number(key) - 1].id);
+  else if (key === "escape") {
+    if (view.popover || !$("request").hidden) closePopover();
+    else view.selected = null;
+    render();
+  }
+});
+
+new ResizeObserver(() => {
+  const diagram = currentDiagram();
+  if (!diagram || !view.views[diagram.id]) return;
+  render();
+  if (!view.views[diagram.id].moved) startView(diagram.id);
+}).observe(stage);
+
+setInterval(render, 1000);
+
+async function connect() {
+  const db = await claude.use("db");
+  if (!db) {
+    showEmpty("The live data is unavailable here", "Open this page signed in to claude.ai with access to this artifact.");
+    return;
+  }
+  const loading = setTimeout(() => {
+    if (!view.loaded) showEmpty("Can't reach the live data yet", "This page keeps trying. Check your connection if this stays.");
+  }, LOADING_MS);
+  db.collection("diagrams").orderBy("createdAt").limit(30).onSnapshot((snapshot) => {
+    if (!snapshot.metadata.fromCache) clearTimeout(loading);
+    view.diagrams = snapshot.docs.map((doc) => doc.data());
+    /* Show a new chart when it arrives, and otherwise follow the latest change until a tab is chosen. */
+    const fresh = view.diagrams.filter((item) => !view.seen.has(item.id));
+    const newest = [...view.diagrams].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+    if (view.loaded && fresh.length) {
+      view.drawingSince = null;
+      view.chosen = fresh[fresh.length - 1].id;
+      view.pinned = false;
+      view.selected = null;
+    } else if (!view.pinned && newest && newest.id !== view.chosen) {
+      view.chosen = newest.id;
+      view.selected = null;
+    }
+    view.diagrams.forEach((item) => view.seen.add(item.id));
+    view.loaded = true;
+    render();
+  }, (error) => {
+    clearTimeout(loading);
+    showEmpty("The live connection ended", `${error.code}: ${error.message}. Reload the page to reconnect.`);
+  });
+  view.comments = await claude.use("comments");
+  view.pickedSignature = null;
+  render();
+}
+connect();
+</script>

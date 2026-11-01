@@ -68,5 +68,6 @@ Not scheduled. Each needs a decision before it is built.
 - [ ] Verify that `update` reports which patches now target changed upstream sections, rather
       than only failing on the next build
 - [ ] Skill-level `allowed-tools` passthrough tests
-- [ ] Support for commands, subagents and hooks alongside skills. Deliberately out of scope for
-      v1; the output layout leaves room
+- [ ] Support for commands, subagents and hooks as their own artifact types alongside skills,
+      managed by skillforge. Deliberately out of scope for v1; the output layout leaves room.
+      Hooks in a skill's frontmatter already pass through

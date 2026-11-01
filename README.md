@@ -100,6 +100,7 @@ params and marks the passages consumers are allowed to change. See
 | [`obsidian-vault`](skills/obsidian-vault/SKILL.md) | Find, create and edit notes in a local Obsidian vault from any project |
 | [`deepseek-paraphrase`](skills/deepseek-paraphrase/SKILL.md) | Reword text with DeepSeek through a script, keeping meaning and structure |
 | [`security-audit`](skills/security-audit/SKILL.md) | Source-first security review or full multi-agent audit, with validators for its findings |
+| [`live-flowchart`](skills/live-flowchart/SKILL.md) | Draw the code as live flowcharts in a claude.ai Artifact, checked against the repository, with build progress on the boxes |
 
 `eli5` is adapted from [anthropics/claude-plugins-community](https://github.com/anthropics/claude-plugins-community)
 under the Apache-2.0 licence; attribution travels with the rendered output and the licence text

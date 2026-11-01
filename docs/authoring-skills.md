@@ -40,7 +40,12 @@ metadata:
 | `metadata.skillforge.attribution` | no | Preserved into rendered output. Required by licence when adapting someone else's work |
 | `metadata.skillforge.params` | no | The param schema, below |
 
-Any other frontmatter key (`allowed-tools`, `license`, …) is passed through untouched.
+Any other frontmatter key (`allowed-tools`, `hooks`, `license`, …) is passed through untouched.
+
+Claude Code registers a skill's `hooks` when the skill is invoked and keeps them for the rest of
+the session, so they must do nothing when the skill isn't in use. Invoking the skill again doesn't
+replace hooks already registered. `${CLAUDE_SKILL_DIR}` expands to nothing in a hook command, so a
+hook can't locate bundled files that way; see `skills/live-flowchart` for one approach.
 
 ## Params
 

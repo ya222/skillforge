@@ -135,3 +135,24 @@ rule, "a managed directory is fully owned, prune anything not in the plan", was 
 every skill a user wrote by hand. Naming what we own is simpler than tracking it, survives a
 lost lockfile, and makes the user scope (`claude-code: {user: true}`) safe by construction.
 `check` verifies that scope like any other and only ever reports.
+
+## 18. live-flowchart: charts describe the code, a script keeps them honest
+
+In `live-flowchart`, a box is a piece of the code and never a task, so a chart stays true if the
+agent stops halfway. The first version charted the agent's plan, which only duplicated a todo list.
+Progress is now a layer on the boxes, and a project keeps long-lived diagrams rather than runs.
+
+Agents draw Mermaid because the structure takes judgment. `flow.py` refuses anything the repository
+doesn't back up, logs each change, and the page renders a replay of that log. Refs name symbols
+rather than lines, and a hash of the code behind each box shows when a chart has gone stale.
+
+Box states describe only the implementation. A mismatch between chart and code is the agent's to
+fix, so hooks tell the agent rather than the page warning the user.
+
+Rejected: agents hand-editing status into Mermaid, as Blueprint does, because nothing validates it;
+generating edges from imports, which needs a parser per language; and a local web server, which
+would update continuously but adds a server to run. The accepted tradeoff is that the page moves
+only when the agent pushes, through `ArtifactData` by file path.
+
+Hook commands cannot use `${CLAUDE_SKILL_DIR}` (tested on Claude Code 2.1.316: it expands to
+nothing), so `draw` installs a copy of the script at a fixed path for them.
