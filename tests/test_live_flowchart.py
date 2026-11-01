@@ -581,6 +581,16 @@ def test_show_summarizes_unless_asked_for_one_chart(flow: Flow) -> None:
     assert "[=] revoke: revoke_session()" in flow.ok("show", "logout")
 
 
+def test_show_connects_a_session_to_the_page_once_it_exists(flow: Flow) -> None:
+    flow.ok("draw", "logout", stdin=DIAGRAM)
+    assert "ArtifactComments" not in flow.ok("show")
+    flow.ok("link", URL)
+    summary = flow.ok("show").splitlines()
+    assert f"WATCH: ArtifactComments action=watch url={URL}" in summary
+    assert f"READ: ArtifactComments action=read url={URL}" in summary
+    assert "ArtifactComments" not in flow.ok("show", "logout")
+
+
 def test_replay_is_identical(flow: Flow) -> None:
     flow.draw()
     flow.ok("begin", "logout", "revoke", "--note", "Starting")

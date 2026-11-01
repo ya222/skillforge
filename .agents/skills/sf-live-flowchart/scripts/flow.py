@@ -1200,6 +1200,9 @@ def command_show(args: argparse.Namespace, project: Path, root: Path) -> int:
     url = read_json(project / "project.json", {}).get("url")
     if url:
         print(f"Live view: {url}")
+        if not args.diagram:
+            print(f"WATCH: ArtifactComments action=watch url={url}")
+            print(f"READ: ArtifactComments action=read url={url}")
     folders = [diagram_dir(project, args.diagram)] if args.diagram else diagram_dirs(project)
     if not folders:
         print("No diagrams yet. Create one with `flow.py draw <name> < diagram.mmd`.")
