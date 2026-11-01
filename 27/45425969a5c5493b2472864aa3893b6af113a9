@@ -1,0 +1,39 @@
+skills/live-flowchart/scripts/flow.py
+  s_4605decf2dce09::t_af8a6adbf5da15 1203-1205
+tests/test_live_flowchart.py
+  s_4605decf2dce09::t_ba54d5e8363fd9 584-593
+skills/live-flowchart/SKILL.md
+  s_4605decf2dce09::t_b890e61cfc3e74 193-196
+  s_4605decf2dce09::t_344edf3ed5cbfb 199-200
+  s_4605decf2dce09::t_6c3c3f036d061c 55-56
+  s_4605decf2dce09::t_c3c03834282c85 16
+  s_4605decf2dce09::t_6af82d579e459d 35-37,43
+  s_4605decf2dce09::t_9f10f400722a1f 190-192,198
+  s_4605decf2dce09::t_c87b240af3f17a 173-189,197
+.agents/skills/sf-live-flowchart/SKILL.md
+  s_4605decf2dce09::t_4ae2495e5e1a09 16,34-36,42,54-55,172-199
+.agents/skills/sf-live-flowchart/scripts/flow.py
+  s_4605decf2dce09::t_08ebe34b6cef59 1203-1205
+.claude/skills/sf-live-flowchart/SKILL.md
+  s_4605decf2dce09::t_6d874ce061c2a3 16,34-36,42,54-55,172-199
+.claude/skills/sf-live-flowchart/scripts/flow.py
+  s_4605decf2dce09::t_52fcf601e52cd8 1203-1205
+skillforge.lock
+  s_4605decf2dce09::t_8c3ff4bc494141 60-61,96,98,160,162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2745425969a5c5493b2472864aa3893b6af113a9",
+  "prompts": {},
+  "sessions": {
+    "s_4605decf2dce09": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "060a4559-1a85-483e-abd6-2917fda7a9a6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Youssef <y9mohamed@gmail.com>"
+    }
+  }
+}
