@@ -58,7 +58,7 @@ skills:
   sf-live-flowchart:
     from: ./skills/live-flowchart
     version: 2.0.0
-    source_hash: sha256:357603ba7a44d72cdb0eeab15ed4a107203214411b161c219691b26b11dcab0e
+    source_hash: sha256:f45389dfa77e80d628e366a6418f03f314b43456f826e76b1f793a644feb4350
   sf-markdown-kanban:
     from: ./skills/markdown-kanban
     version: 1.1.0
@@ -93,9 +93,9 @@ outputs:
   .agents/skills/sf-grill-me/SKILL.md: sha256:28035ca2407f0ccd52af7156087ec6b7043e070a9136fe66bfe186503682c59d
   .agents/skills/sf-handoff/SKILL.md: sha256:31e807bab0a9aeed374cec7e2649890841321b08242effbd79f9f8315d7d4274
   .agents/skills/sf-isometric-system-map/SKILL.md: sha256:80f890b0b98df818bad949b0e679f28be7ee386ebb879ec5d74953397e179d08
-  .agents/skills/sf-live-flowchart/SKILL.md: sha256:8ded57b6aa9ace35736324e5cc04d329a09a8af788b7182ad4f738996cac4c85
+  .agents/skills/sf-live-flowchart/SKILL.md: sha256:4113c37c79725ab5bb7f443bdee8a6cafd3dabfaf605ee70f865abb2ad9505f9
   .agents/skills/sf-live-flowchart/assets/view.html: sha256:1ff4cfc68faca7d4a8181424d10afd2cfce8e2437649e08e15ef6409ca8caf57
-  .agents/skills/sf-live-flowchart/scripts/flow.py: sha256:4ace8a5cd6449b7481ba7937bc53229b9ae33b841559913e60cb8a9bf16f7d2f
+  .agents/skills/sf-live-flowchart/scripts/flow.py: sha256:3bd5af3ce35191f9817a757285a8a76cb1e9687117713823b372e6479a960d45
   .agents/skills/sf-markdown-kanban/SKILL.md: sha256:4b2c978c9b64b1fa1331387aa76ebc298cf417a753240685fd1498608fbbaf04
   .agents/skills/sf-security-audit/AI-AND-LLM.md: sha256:7335a95c43554eadefcf03ece639291bb0e038c398a179299e3887ffe06bd2ef
   .agents/skills/sf-security-audit/ATTACK-CLASSES.md: sha256:3ee4f00c6e8c9dcf6dd02dd5ac2a4ceb322e2085f3e9fbe79cf0c6330bc7ef83
@@ -157,9 +157,9 @@ outputs:
   .claude/skills/sf-grill-me/SKILL.md: sha256:28035ca2407f0ccd52af7156087ec6b7043e070a9136fe66bfe186503682c59d
   .claude/skills/sf-handoff/SKILL.md: sha256:31e807bab0a9aeed374cec7e2649890841321b08242effbd79f9f8315d7d4274
   .claude/skills/sf-isometric-system-map/SKILL.md: sha256:80f890b0b98df818bad949b0e679f28be7ee386ebb879ec5d74953397e179d08
-  .claude/skills/sf-live-flowchart/SKILL.md: sha256:8ded57b6aa9ace35736324e5cc04d329a09a8af788b7182ad4f738996cac4c85
+  .claude/skills/sf-live-flowchart/SKILL.md: sha256:4113c37c79725ab5bb7f443bdee8a6cafd3dabfaf605ee70f865abb2ad9505f9
   .claude/skills/sf-live-flowchart/assets/view.html: sha256:1ff4cfc68faca7d4a8181424d10afd2cfce8e2437649e08e15ef6409ca8caf57
-  .claude/skills/sf-live-flowchart/scripts/flow.py: sha256:4ace8a5cd6449b7481ba7937bc53229b9ae33b841559913e60cb8a9bf16f7d2f
+  .claude/skills/sf-live-flowchart/scripts/flow.py: sha256:3bd5af3ce35191f9817a757285a8a76cb1e9687117713823b372e6479a960d45
   .claude/skills/sf-markdown-kanban/SKILL.md: sha256:4b2c978c9b64b1fa1331387aa76ebc298cf417a753240685fd1498608fbbaf04
   .claude/skills/sf-security-audit/AI-AND-LLM.md: sha256:7335a95c43554eadefcf03ece639291bb0e038c398a179299e3887ffe06bd2ef
   .claude/skills/sf-security-audit/ATTACK-CLASSES.md: sha256:3ee4f00c6e8c9dcf6dd02dd5ac2a4ceb322e2085f3e9fbe79cf0c6330bc7ef83

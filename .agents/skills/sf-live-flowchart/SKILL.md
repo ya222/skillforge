@@ -113,6 +113,10 @@ exact arguments, and run `flow.py link <url>`. The project keeps one artifact, w
 diagram. Name the project once with `flow.py topic "<what it is>"`, and give the user the live view
 URL.
 
+To chart another branch, add `--ref <branch>`, which reads it through git. Never switch the user's
+checkout to draw. A chart follows the branch it was drawn from, so changing branches doesn't flag it.
+To build boxes on a chart, its branch must be checked out.
+
 To change a chart's structure, run `flow.py source <diagram>`, edit it and draw it again under the
 same name. Progress is kept for boxes whose ids stay the same.
 

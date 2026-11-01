@@ -50,6 +50,7 @@ EDIT_TOOLS = {"Edit", "Write", "NotebookEdit"}
 SKIPPED_DIRS = {".git", "__pycache__", "node_modules", ".venv"}
 GLYPHS = {"planned": "[ ]", "active": "[>]", "built": "[=]", "failed": "[x]"}
 CLOSERS = ("}", ")", "]", "end")
+NON_CODE_RE = re.compile(r"\"[^\"]*\"|'[^']*'|#.*$|//.*$")
 CHECK_TAIL_CHARS = 2000
 CHECK_TIMEOUT_SECONDS = 600
 MAX_EVENTS_IN_SNAPSHOT = 60
@@ -281,9 +282,17 @@ def project_root(start: Path) -> Path:
 
 
 def block_end(lines: list[str], start: int) -> int:
-    """Where a definition's block stops, by indentation, so this works in any language."""
+    """Where a definition's block stops, by brackets then indentation, so any language works."""
+    depth = 0
+    header = start
+    for index in range(start, len(lines)):
+        header = index
+        code = NON_CODE_RE.sub("", lines[index])
+        depth += sum(code.count(mark) for mark in "([{") - sum(code.count(mark) for mark in ")]}")
+        if depth <= 0:
+            break
     indent = len(lines[start]) - len(lines[start].lstrip())
-    for index in range(start + 1, len(lines)):
+    for index in range(header + 1, len(lines)):
         stripped = lines[index].strip()
         if not stripped:
             continue
@@ -292,13 +301,55 @@ def block_end(lines: list[str], start: int) -> int:
     return len(lines)
 
 
-def digest_directory(path: Path) -> str:
+def digest_files(files: list[tuple[str, bytes]]) -> str:
     digest = hashlib.sha256()
-    for item in sorted(path.rglob("*")):
-        if item.is_file() and not SKIPPED_DIRS.intersection(item.parts):
-            digest.update(str(item.relative_to(path)).encode())
-            digest.update(item.read_bytes())
+    for name, content in sorted(files):
+        if not SKIPPED_DIRS.intersection(Path(name).parts):
+            digest.update(name.encode())
+            digest.update(content)
     return digest.hexdigest()[:16]
+
+
+class CodeView:
+    """The code a chart describes: the working tree, or another branch read through git."""
+
+    def __init__(self, root: Path, ref: str | None = None) -> None:
+        self.root = root
+        self.ref = ref
+
+    def kind(self, path: str) -> str | None:
+        if self.ref is None:
+            full = self.root / path
+            return "dir" if full.is_dir() else "file" if full.exists() else None
+        found = git(self.root, "cat-file", "-t", f"{self.ref}:{path}")
+        if found.returncode != 0:
+            return None
+        return "dir" if found.stdout.strip() == "tree" else "file"
+
+    def read(self, path: str) -> str:
+        if self.ref is None:
+            return (self.root / path).read_text(errors="replace")
+        return git(self.root, "show", f"{self.ref}:{path}").stdout
+
+    def digest_dir(self, path: str) -> str:
+        if self.ref is None:
+            base = self.root / path
+            items = [item for item in base.rglob("*") if item.is_file()]
+            return digest_files([(str(i.relative_to(base)), i.read_bytes()) for i in items])
+        listing = git(self.root, "ls-tree", "-r", "--name-only", f"{self.ref}:{path}")
+        files = []
+        for name in listing.stdout.splitlines():
+            shown = subprocess.run(
+                ["git", "-C", str(self.root), "show", f"{self.ref}:{path}/{name}"],
+                capture_output=True,
+            )
+            files.append((name, shown.stdout))
+        return digest_files(files)
+
+
+def view_for(root: Path, branch: str | None) -> CodeView:
+    """A chart reads the working tree when its branch is checked out, and git otherwise."""
+    return CodeView(root, branch if branch not in (None, "HEAD", current_branch(root)) else None)
 
 
 def split_ref(ref: str) -> tuple[str, str, str]:
@@ -341,19 +392,20 @@ def locate(text: str, ref: str) -> tuple[int | None, str, str]:
     return start + 1, hashlib.sha256(block.encode()).hexdigest()[:16], block
 
 
-def resolve_ref(root: Path, ref: str) -> dict:
-    """Find what a ref points at and hash it. Raises when the repository has no such thing."""
+def resolve_ref(view: CodeView, ref: str) -> dict:
+    """Find what a ref points at and hash it. Raises when the code has no such thing."""
     path_text, symbol, anchor = split_ref(ref)
-    path = (root / path_text).resolve()
-    if not path.is_relative_to(root):
+    if not (view.root / path_text).resolve().is_relative_to(view.root):
         raise FlowError(f"{ref}: the path is outside the project")
-    if not path.exists():
-        raise FlowError(f"{ref}: {path_text} doesn't exist")
-    if path.is_dir():
+    kind = view.kind(path_text)
+    if kind is None:
+        where = f" on {view.ref}" if view.ref else ""
+        raise FlowError(f"{ref}: {path_text} doesn't exist{where}")
+    if kind == "dir":
         if symbol or anchor:
             raise FlowError(f"{ref}: {path_text} is a folder, so it can't hold a symbol")
-        return {"path": path_text, "symbol": None, "line": None, "hash": digest_directory(path)}
-    line, digest, _ = locate(path.read_text(errors="replace"), ref)
+        return {"path": path_text, "symbol": None, "line": None, "hash": view.digest_dir(path_text)}
+    line, digest, _ = locate(view.read(path_text), ref)
     return {"path": path_text, "symbol": symbol or None, "line": line, "hash": digest}
 
 
@@ -366,15 +418,15 @@ def current_branch(root: Path) -> str | None:
     return found.stdout.strip() if found.returncode == 0 else None
 
 
-def base_commit(root: Path) -> str | None:
-    """Where this branch began: its fork from the default branch, or HEAD if it is that branch."""
-    head = git(root, "rev-parse", "--verify", "--quiet", "HEAD^{commit}")
+def base_commit(root: Path, tip: str = "HEAD") -> str | None:
+    """Where a branch began: its fork from the default branch, or its tip if it is that branch."""
+    head = git(root, "rev-parse", "--verify", "--quiet", f"{tip}^{{commit}}")
     if head.returncode != 0:
         return None
     origin = git(root, "symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD")
     names = [origin.stdout.strip()] if origin.returncode == 0 else []
     for name in [*names, "main", "master"]:
-        fork = git(root, "merge-base", "HEAD", name)
+        fork = git(root, "merge-base", tip, name)
         if fork.returncode == 0:
             return fork.stdout.strip()
     return head.stdout.strip()
@@ -385,41 +437,44 @@ def format_diff(old: str, new: str) -> str:
     return "\n".join(list(lines)[2:])
 
 
-def compare_box(root: Path, commit: str, ref: str) -> tuple[str, str] | None:
+def compare_box(view: CodeView, commit: str, ref: str) -> tuple[str, str] | None:
     """How the code behind a ref differs from a commit: (added or changed, its diff), or None."""
+    root = view.root
     path_text, symbol, anchor = split_ref(ref)
-    kind = git(root, "cat-file", "-t", f"{commit}:{path_text}")
-    current = root / path_text
-    if kind.returncode != 0:
-        if current.is_file():
-            try:
-                return "added", format_diff("", locate(current.read_text(errors="replace"), ref)[2])
-            except FlowError:
-                return "added", ""
-        return "added", ""
+    if git(root, "cat-file", "-t", f"{commit}:{path_text}").returncode != 0:
+        if view.kind(path_text) != "file":
+            return "added", ""
+        try:
+            return "added", format_diff("", locate(view.read(path_text), ref)[2])
+        except FlowError:
+            return "added", ""
     if not symbol and not anchor:
-        change = git(root, "diff", commit, "--", path_text).stdout
+        tip = [view.ref] if view.ref else []
+        change = git(root, "diff", commit, *tip, "--", path_text).stdout
         return ("changed", "\n".join(change.splitlines()[4:])) if change else None
     old = git(root, "show", f"{commit}:{path_text}").stdout
+    current = view.read(path_text) if view.kind(path_text) == "file" else None
     try:
         _, old_hash, old_block = locate(old, ref)
     except FlowError:
-        new_block = locate(current.read_text(errors="replace"), ref)[2]
-        return "added", format_diff("", new_block)
+        return "added", format_diff("", locate(current or "", ref)[2])
     try:
-        _, new_hash, new_block = locate(current.read_text(errors="replace"), ref)
-    except (FlowError, OSError):
+        _, new_hash, new_block = locate(current if current is not None else "", ref)
+    except FlowError:
         return "changed", format_diff(old_block, "")
     return None if new_hash == old_hash else ("changed", format_diff(old_block, new_block))
 
 
-def changed_files(root: Path, commit: str) -> list[dict]:
+def changed_files(view: CodeView, commit: str) -> list[dict]:
     """Every file that differs from a commit, including ones git doesn't track yet."""
+    tip = [view.ref] if view.ref else []
     files = []
-    for line in git(root, "diff", "--name-status", commit).stdout.splitlines():
+    for line in git(view.root, "diff", "--name-status", commit, *tip).stdout.splitlines():
         status, *paths = line.split("\t")
         files.append({"path": paths[-1], "status": status[0]})
-    untracked = git(root, "ls-files", "--others", "--exclude-standard").stdout.splitlines()
+    if view.ref:
+        return files
+    untracked = git(view.root, "ls-files", "--others", "--exclude-standard").stdout.splitlines()
     return files + [{"path": path, "status": "A"} for path in untracked]
 
 
@@ -560,6 +615,7 @@ def apply_drawn(diagram: dict, event: dict) -> None:
         nodes.append(node)
     diagram.update(title=graph["title"], edges=graph["edges"], groups=graph["groups"], nodes=nodes)
     diagram["root"] = event.get("root")
+    diagram["branch"] = event.get("tiedBranch") or event.get("branch")
 
 
 def apply_event(diagram: dict, event: dict) -> None:
@@ -659,7 +715,7 @@ def fold(events: list[dict]) -> dict:
     latest_begun = None
     for event in events:
         diagram["seq"], diagram["updatedAt"] = event["seq"], event["at"]
-        diagram["branch"], diagram["topic"] = event.get("branch"), event.get("topic")
+        diagram["topic"] = event.get("topic")
         if event["type"] not in ACTIVITY_EVENTS:
             diagram["lastTransitionSeq"] = event["seq"]
         if event["type"] == "drawn":
@@ -723,13 +779,22 @@ def find_node(diagram: dict, node_id: str) -> dict:
 def scan(folder: Path, root: Path, only: set[str] | None = None) -> dict:
     """Log any box whose code moved. A box being worked on is expected to change."""
     diagram = load(folder)
+    view = view_for(root, diagram["branch"])
+    marker = folder / "scan.tip"
+    tip = (
+        git(root, "rev-parse", "--verify", "--quiet", f"{view.ref}^{{commit}}").stdout
+        if view.ref
+        else ""
+    )
+    if view.ref and marker.exists() and marker.read_text() == tip:
+        return diagram
     for node in diagram["nodes"]:
         if only is not None and node["id"] not in only:
             continue
         if not node["ref"] or node["status"] != "built" or not node["resolved"]:
             continue
         try:
-            found = resolve_ref(root, node["ref"])
+            found = resolve_ref(view, node["ref"])
         except FlowError as error:
             if not node["broken"]:
                 diagram = append(
@@ -741,6 +806,8 @@ def scan(folder: Path, root: Path, only: set[str] | None = None) -> dict:
             diagram = append(folder, {"type": "fresh", "node": node["id"]})
         elif not matches and not node["stale"]:
             diagram = append(folder, {"type": "stale", "node": node["id"]})
+    if view.ref:
+        write_atomic(marker, tip)
     return diagram
 
 
@@ -753,6 +820,7 @@ def scan_all(folders: list[Path], root: Path) -> None:
 
 def build_comparison(root: Path, commit: str, diagram: dict) -> dict:
     """Everything that differs from a commit: boxes with their diffs, other files, removed boxes."""
+    view = view_for(root, diagram["branch"])
     show = git(root, "log", "-1", "--format=%ct%x00%s", commit).stdout.strip()
     stamp, _, subject = show.partition("\0")
     states, diffs = {}, {}
@@ -760,7 +828,7 @@ def build_comparison(root: Path, commit: str, diagram: dict) -> dict:
     for node in diagram["nodes"]:
         if not node["ref"] or not node["resolved"]:
             continue
-        found = compare_box(root, commit, node["ref"])
+        found = compare_box(view, commit, node["ref"])
         if not found:
             continue
         states[node["id"]], diff = found
@@ -770,7 +838,7 @@ def build_comparison(root: Path, commit: str, diagram: dict) -> dict:
             budget -= len(diff)
     others = [
         item
-        for item in changed_files(root, commit)
+        for item in changed_files(view, commit)
         if not any(covers(node, item["path"]) for node in diagram["nodes"])
     ]
     removed = [
@@ -783,7 +851,7 @@ def build_comparison(root: Path, commit: str, diagram: dict) -> dict:
         "commit": commit,
         "short": commit[:7],
         "subject": subject,
-        "auto": commit == base_commit(root),
+        "auto": commit == base_commit(root, view.ref or "HEAD"),
         "states": states,
         "diffs": diffs,
         "files": others[:MAX_OTHER_FILES],
@@ -794,19 +862,23 @@ def build_comparison(root: Path, commit: str, diagram: dict) -> dict:
 
 def refresh_base(folder: Path, root: Path) -> dict | None:
     """Keep the comparison with the branch start current. The caller holds the lock."""
-    commit = base_commit(root)
+    diagram = load(folder)
+    view = view_for(root, diagram["branch"])
+    commit = base_commit(root, view.ref or "HEAD")
     if commit is None:
         return None
-    untracked = git(root, "ls-files", "--others", "--exclude-standard").stdout.splitlines()
-    stamps = [(path, (root / path).stat().st_mtime_ns) for path in untracked]
+    tip = [view.ref] if view.ref else []
+    untracked = [] if view.ref else git(root, "ls-files", "--others", "--exclude-standard").stdout
+    stamps = [
+        (path, (root / path).stat().st_mtime_ns) for path in str(untracked or "").splitlines()
+    ]
     log = (folder / "events.jsonl").read_bytes()
     drawn = [line for line in log.splitlines() if b'"type": "drawn"' in line]
-    state = [commit, git(root, "diff", commit).stdout, stamps, len(drawn)]
+    state = [commit, view.ref, git(root, "diff", commit, *tip).stdout, stamps, len(drawn)]
     signature = hashlib.sha256(json.dumps(state).encode()).hexdigest()
     marker = folder / "compare.sig"
     if marker.exists() and marker.read_text() == signature:
         return None
-    diagram = load(folder)
     event = build_comparison(root, commit, diagram)
     write_atomic(marker, signature)
     keys = ("states", "diffs", "files", "filesTotal", "removed")
@@ -894,12 +966,19 @@ def command_draw(args: argparse.Namespace, project: Path, root: Path) -> None:
         raise FlowError(f"diagram name `{args.diagram}` must be lower-kebab-case")
     source = sys.stdin.read()
     graph = parse_diagram(source)
+    if (
+        args.ref
+        and git(root, "rev-parse", "--verify", "--quiet", f"{args.ref}^{{commit}}").returncode
+    ):
+        raise FlowError(f"`{args.ref}` isn't a branch or commit in {root}")
+    branch = args.ref or current_branch(root)
+    view = view_for(root, branch)
     resolved = {}
     for node in graph["nodes"]:
         if not node["ref"]:
             continue
         try:
-            resolved[node["id"]] = resolve_ref(root, node["ref"])
+            resolved[node["id"]] = resolve_ref(view, node["ref"])
         except FlowError as error:
             if not node["planned"]:
                 raise FlowError(
@@ -925,6 +1004,7 @@ def command_draw(args: argparse.Namespace, project: Path, root: Path) -> None:
                 "type": "drawn",
                 "diagram": args.diagram,
                 "root": str(root),
+                "tiedBranch": branch,
                 "graph": graph,
                 "resolved": resolved,
             },
@@ -954,10 +1034,9 @@ def command_link(args: argparse.Namespace, project: Path, root: Path) -> None:
 
 
 def command_topic(args: argparse.Namespace, project: Path, root: Path) -> None:
+    project.mkdir(parents=True, exist_ok=True)
     meta_path = project / "project.json"
-    if not meta_path.exists():
-        raise FlowError(f"no project at {project}: run `flow.py draw` first")
-    meta = read_json(meta_path, {})
+    meta = read_json(meta_path, {"path": str(root), "url": None, "viewSha": None})
     meta["topic"] = args.text
     write_atomic(meta_path, json.dumps(meta, indent=2) + "\n")
     print(f"Topic: {args.text}")
@@ -969,10 +1048,20 @@ def command_topic(args: argparse.Namespace, project: Path, root: Path) -> None:
             print(line)
 
 
+def require_checked_out(diagram: dict, root: Path) -> None:
+    ref = view_for(root, diagram["branch"]).ref
+    if ref:
+        raise FlowError(
+            f"`{diagram['id']}` follows {ref}, which isn't checked out. Switch to it to build there"
+        )
+
+
 def command_begin(args: argparse.Namespace, project: Path, root: Path) -> None:
     folder = diagram_dir(project, args.diagram)
     with locked(folder):
-        node = find_node(load(folder), args.box)
+        diagram = load(folder)
+        require_checked_out(diagram, root)
+        node = find_node(diagram, args.box)
         if node["status"] == "active":
             raise FlowError(f"box `{args.box}` is already active")
         diagram = append(
@@ -1011,14 +1100,16 @@ def require_active(diagram: dict, box: str, action: str) -> dict:
 def command_done(args: argparse.Namespace, project: Path, root: Path) -> int:
     folder = diagram_dir(project, args.diagram)
     with locked(folder):
-        node = require_active(load(folder), args.box, "finish")
+        diagram = load(folder)
+        require_checked_out(diagram, root)
+        node = require_active(diagram, args.box, "finish")
     check, ref = node["check"], node["ref"]
     if not ref and node["shape"] != "terminal":
         raise FlowError(
             f"box `{args.box}` isn't tied to code yet. Add `%% code: {args.box} <path>:<symbol>`"
             " and draw again"
         )
-    resolved = resolve_ref(root, ref) if ref else None
+    resolved = resolve_ref(CodeView(root), ref) if ref else None
     # The check can take minutes, so it runs outside the lock and the box is re-checked after.
     result = run_check(check, root, args.timeout) if check else None
     event: dict = {"node": args.box, "note": args.note}
@@ -1066,7 +1157,7 @@ def command_confirm(args: argparse.Namespace, project: Path, root: Path) -> None
         node = find_node(diagram, args.box)
         if not node["stale"] and not node["broken"]:
             raise FlowError(f"box `{args.box}` already matches the code")
-        resolved = resolve_ref(root, node["ref"])
+        resolved = resolve_ref(view_for(root, diagram["branch"]), node["ref"])
         boxes = [
             item["id"]
             for item in diagram["nodes"]
@@ -1193,14 +1284,15 @@ def record_artifact_push(payload: dict) -> bool:
     path = Path(raw)
     if path.parent.name != "snapshots" or not path.is_relative_to(state_home()):
         return False
-    response = json.dumps(payload.get("tool_response"))
-    found = re.search(r"now at version (\d+)", response)
-    if not found:
+    response = payload.get("tool_response")
+    write = response.get("db_write") if isinstance(response, dict) else None
+    version = write.get("version") if isinstance(write, dict) else None
+    if not isinstance(version, int):
         raise FlowError(
-            f"pushed {path}, but the tool response names no version: {response[:300]}. "
+            f"pushed {path}, but the tool response names no version: {json.dumps(response)[:300]}. "
             "Run `flow.py pushed <diagram> --seq <seq> --version <version>`."
         )
-    record_push(path.parent.parent, int(path.stem), int(found.group(1)))
+    record_push(path.parent.parent, int(path.stem), version)
     return True
 
 
@@ -1215,6 +1307,8 @@ def record_edit(folder: Path, root: Path, file: str) -> str | None:
     """Tie an edit to the boxes it touched. Returns a note when no box on this chart covers it."""
     with locked(folder):
         diagram = load(folder)
+        if view_for(root, diagram["branch"]).ref:
+            return None
         matched = {node["id"] for node in diagram["nodes"] if covers(node, file)}
         active = any(node["status"] == "active" for node in diagram["nodes"])
         if matched:
@@ -1270,13 +1364,22 @@ def hook_post_tool(payload: dict) -> None:
         scan_all(folders, root)
     if payload.get("agent_id"):
         return
+    # Each thing is said once. The Stop hook catches anything still undone at the end.
     problems = chart_problems(folders)
-    if problems:
-        messages.append(fix_instructions(problems))
+    told = project_dir(root) / "told-problems"
+    if folders and "; ".join(problems) != (told.read_text() if told.exists() else ""):
+        write_atomic(told, "; ".join(problems))
+        if problems:
+            messages.append(fix_instructions(problems))
     for folder in folders:
         diagram = load(folder)
-        if diagram["lastTransitionSeq"] > push_state(folder)["seq"]:
-            messages.append(f"Live flowchart is behind. {push_line(folder, diagram)}")
+        last = diagram["lastTransitionSeq"]
+        marker = folder / "told-push"
+        said = int(marker.read_text()) if marker.exists() else 0
+        line = push_line(folder, diagram)
+        if last > push_state(folder)["seq"] and last > said and line and "blocked" not in line:
+            write_atomic(marker, str(last))
+            messages.append(f"Live flowchart is behind. {line}")
     if messages:
         output = {
             "hookSpecificOutput": {
@@ -1323,6 +1426,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     draw = add("draw", command_draw, "Create or update a diagram from Mermaid on stdin")
     draw.add_argument("diagram")
+    draw.add_argument("--ref", help="Draw from this branch without switching to it")
     add("link", command_link, "Record the published artifact URL").add_argument("url")
     add("topic", command_topic, "Name what the project is about").add_argument("text")
     add("show", command_show, "Check charts against the code and report").add_argument(

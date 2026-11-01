@@ -103,7 +103,11 @@ class Flow:
             "post-tool",
             tool_name="ArtifactData",
             tool_input={"file_path": str(path)},
-            tool_response=f"The document is now at version {version}.",
+            tool_response={
+                "written": {"url": URL},
+                "owned": True,
+                "db_write": {"op": "set", "committed": True, "version": version},
+            },
         )
 
 
@@ -432,19 +436,141 @@ def test_older_comparison_records_still_replay(flow: Flow) -> None:
     assert (entry["auto"], entry["diffs"], entry["files"]) == (False, {}, [])
 
 
-def test_diagrams_carry_the_branch_and_topic(flow: Flow) -> None:
+def test_a_chart_keeps_its_branch_and_the_project_keeps_its_topic(flow: Flow) -> None:
     commit(flow, "First")
     subprocess.run(["git", "checkout", "-qb", "feature/invites"], cwd=flow.root, check=True)
-    flow.draw()
-    assert flow.snapshot()["branch"] == "feature/invites"
-    assert flow.snapshot()["topic"] is None
-
     flow.ok("topic", "Team invites")
-    assert flow.snapshot()["topic"] == "Team invites"
+    flow.draw()
+    assert (flow.snapshot()["branch"], flow.snapshot()["topic"]) == (
+        "feature/invites",
+        "Team invites",
+    )
     subprocess.run(["git", "checkout", "-qb", "next"], cwd=flow.root, check=True)
     flow.ok("note", "logout", "revoke", "Moved branch")
-    snapshot = flow.snapshot()
-    assert (snapshot["branch"], snapshot["topic"]) == ("next", "Team invites")
+    assert flow.snapshot()["branch"] == "feature/invites"
+
+
+MULTILINE = """\
+async def run_import(
+    session,
+    *,
+    start,
+) -> list:
+    documents = []
+    if isinstance(session, Stats):
+        documents.append(start)
+    return documents
+
+
+def other():
+    return 1
+"""
+
+
+def multiline_chart(ref: str) -> str:
+    return (
+        "---\ntitle: T\n---\nflowchart TD\n  a[Run] --> z([End])\n"
+        f"  %% code: a src/runner.py:{ref}\n"
+    )
+
+
+def test_a_box_covers_the_body_after_a_multi_line_signature(flow: Flow) -> None:
+    path = flow.root / "src" / "runner.py"
+    path.write_text(MULTILINE)
+    flow.draw(multiline_chart("run_import"), "runner")
+    assert "Every box matches" in flow.ok("show")
+    path.write_text(MULTILINE.replace("return 1", "return 2"))
+    assert "Every box matches" in flow.ok("show")
+    path.write_text(MULTILINE.replace("documents = []", "documents = [1]"))
+    assert flow.run("show").returncode == 2
+    assert flow.node("a", "runner")["stale"]
+
+
+def test_a_branch_can_point_at_a_line_after_a_multi_line_signature(flow: Flow) -> None:
+    (flow.root / "src" / "runner.py").write_text(MULTILINE)
+    flow.draw(multiline_chart("run_import > isinstance(session, Stats)"), "runner")
+    assert flow.node("a", "runner")["resolved"]["line"] == 7
+
+
+def test_multi_line_signatures_work_with_braces_too(flow: Flow) -> None:
+    code = "export function run(\n  a,\n  b,\n) {\n  return a;\n}\n\nconst next = 1;\n"
+    path = flow.root / "src" / "runner.ts"
+    path.write_text(code)
+    source = multiline_chart("run").replace("runner.py", "runner.ts")
+    flow.draw(source, "runner")
+    path.write_text(code.replace("next = 1", "next = 2"))
+    assert "Every box matches" in flow.ok("show")
+    path.write_text(code.replace("return a", "return b"))
+    assert flow.run("show").returncode == 2
+
+
+def on_other_branch(flow: Flow) -> None:
+    commit(flow, "First")
+    subprocess.run(["git", "branch", "-M", "main"], cwd=flow.root, check=True)
+    subprocess.run(["git", "checkout", "-qb", "m2"], cwd=flow.root, check=True)
+    (flow.root / "src" / "mail.py").write_text("def send():\n    pass\n")
+    commit(flow, "On m2")
+    subprocess.run(["git", "checkout", "-q", "main"], cwd=flow.root, check=True)
+
+
+def current(flow: Flow) -> str:
+    found = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+    return subprocess.run(found, cwd=flow.root, capture_output=True, text=True).stdout.strip()
+
+
+def test_draw_can_read_another_branch_without_switching(flow: Flow) -> None:
+    on_other_branch(flow)
+    source = DIAGRAM.replace("  class email planned\n", "")
+    assert "src/mail.py doesn't exist" in flow.refused("draw", "logout", stdin=source)
+    flow.ok("draw", "logout", "--ref", "m2", stdin=source)
+    flow.ok("link", URL)
+    assert current(flow) == "main"
+    assert flow.snapshot()["branch"] == "m2"
+    assert flow.node("email")["resolved"]["line"] == 1
+    assert flow.snapshot()["comparisons"][0]["states"] == {"email": "added"}
+    assert "isn't a branch" in flow.refused("draw", "x", "--ref", "nope", stdin=source)
+
+
+def test_switching_branches_does_not_flag_a_chart(flow: Flow) -> None:
+    on_other_branch(flow)
+    source = DIAGRAM.replace("  class email planned\n", "")
+    flow.ok("draw", "logout", "--ref", "m2", stdin=source)
+    flow.ok("link", URL)
+    assert "Every box matches" in flow.ok("show")
+    subprocess.run(["git", "checkout", "-q", "m2"], cwd=flow.root, check=True)
+    assert "Every box matches" in flow.ok("show")
+    subprocess.run(["git", "checkout", "-q", "main"], cwd=flow.root, check=True)
+    assert "Every box matches" in flow.ok("show")
+
+    (flow.root / "src" / "session.py").write_text(CHANGED)
+    flow.edit("src/session.py")
+    assert not flow.node("revoke")["stale"]
+    assert flow.node("revoke")["touched"] == []
+    assert "Switch to it to build" in flow.refused("begin", "logout", "revoke")
+
+
+def test_a_chart_on_another_branch_notices_when_that_branch_moves(flow: Flow) -> None:
+    on_other_branch(flow)
+    source = DIAGRAM.replace("  class email planned\n", "")
+    flow.ok("draw", "logout", "--ref", "m2", stdin=source)
+    flow.ok("link", URL)
+    subprocess.run(["git", "checkout", "-q", "m2"], cwd=flow.root, check=True)
+    (flow.root / "src" / "mail.py").write_text("def send():\n    return 1\n")
+    commit(flow, "Move m2")
+    subprocess.run(["git", "checkout", "-q", "main"], cwd=flow.root, check=True)
+    assert flow.run("show").returncode == 2
+    assert flow.node("email")["stale"]
+
+
+def test_reminders_are_said_once(flow: Flow) -> None:
+    flow.ok("draw", "logout", stdin=DIAGRAM)
+    assert flow.hook("post-tool", tool_name="Bash", tool_input={}) == "", "nothing to push to yet"
+    flow.ok("link", URL)
+    flow.push(1)
+    flow.ok("begin", "logout", "revoke")
+    assert "PUSH" in flow.hook("post-tool", tool_name="Bash", tool_input={})
+    assert flow.hook("post-tool", tool_name="Bash", tool_input={}) == ""
+    assert "PUSH" in json.loads(flow.hook("stop"))["reason"], "the Stop hook still catches it"
 
 
 def test_show_summarizes_unless_asked_for_one_chart(flow: Flow) -> None:
@@ -602,10 +728,7 @@ def test_the_agent_is_told_once_about_a_file_the_chart_does_not_cover(flow: Flow
     flow.ok("begin", "logout", "revoke")
     first = json.loads(flow.edit("README.md"))["hookSpecificOutput"]["additionalContext"]
     assert "README.md changed and no box in `logout` covers it" in first
-    assert (
-        "no box in"
-        not in json.loads(flow.edit("README.md"))["hookSpecificOutput"]["additionalContext"]
-    )
+    assert flow.edit("README.md") == ""
 
 
 def test_stop_hook_blocks_once_while_anything_is_unpushed(flow: Flow) -> None:
