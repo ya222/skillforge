@@ -28,6 +28,8 @@ and stop.
    - It refuses to overwrite `<out-file>`; pass `--force` only when the user asks.
    - `--model` picks another DeepSeek model. `--temperature` defaults to 1.0; higher means
      more varied wording.
+   - `--guidance-file` adds a file's text to the prompt, for style rules or a sample of the
+     author's writing.
    - If it reports that DeepSeek stopped early, split the input at a heading or paragraph
      break and run each part.
 3. Report the path and counts the script printed. Read the output file only when the user

@@ -5,7 +5,7 @@ Reads a file, writes the rewrite to another file, and prints only the output pat
 so the text never has to pass through the agent's context.
 
 Standard library only. Needs DEEPSEEK_PARAPHRASE_API_KEY. Usage:
-    paraphrase.py IN OUT [--model M] [--temperature T] [--force]
+    paraphrase.py IN OUT [--model M] [--temperature T] [--guidance-file F] [--force]
 """
 
 from __future__ import annotations
@@ -19,25 +19,35 @@ import urllib.request
 from pathlib import Path
 
 API_URL = "https://api.deepseek.com/chat/completions"
-DEFAULT_MODEL = "deepseek-flash"
+DEFAULT_MODEL = "deepseek-v4-pro"
 TIMEOUT_SECONDS = 300
 
 SYSTEM_PROMPT = """\
-Rewrite the user's text in your own words. Keep every fact, claim, number, name, code span,
-link and the overall structure (headings, lists, paragraphs, Markdown). Change wording and
-sentence construction throughout: do not keep any phrase longer than four words from the
-original except names, quotations, code and technical terms. Keep the tone and length roughly
-the same. Output only the rewritten text, with no preamble or commentary."""
+Rewrite the user's text so it reads as freshly written by the same author. Restructure sentences:
+change their order, openings and rhythm, and merge or split them where that reads better. Do not
+just swap words for synonyms, and leave a plain word alone rather than replace it with a fancier
+or odder one.
+
+Keep every fact, claim, number, name, code span, link and the overall structure (headings, lists,
+paragraphs, Markdown), with the tone and length roughly the same. Keep technical terms exactly.
+Keep the verbs that state someone's role or level of responsibility, such as led, lead, owned,
+contributed, collaborated, co-engineered, because changing them changes the claim. Never use em
+dashes; use a comma, colon or full stop instead. Output only the rewritten text, with no preamble
+or commentary."""
 
 
-def paraphrase(text: str, model: str, temperature: float, api_key: str) -> tuple[str, dict]:
+def paraphrase(
+    text: str, model: str, temperature: float, api_key: str, guidance: str = ""
+) -> tuple[str, dict]:
+    system = f"{SYSTEM_PROMPT}\n\n{guidance}" if guidance else SYSTEM_PROMPT
     body = json.dumps(
         {
             "model": model,
             "temperature": temperature,
-            "thinking": {"type": "disabled"},
+            "thinking": {"type": "enabled"},
+            "reasoning_effort": "low",
             "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system},
                 {"role": "user", "content": text},
             ],
         }
@@ -65,6 +75,7 @@ def main() -> None:
     parser.add_argument("output", type=Path)
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--guidance-file", type=Path, help="extra style guidance for the prompt")
     parser.add_argument("--force", action="store_true", help="overwrite OUT if it exists")
     args = parser.parse_args()
 
@@ -78,7 +89,8 @@ def main() -> None:
     if not text.strip():
         sys.exit(f"error: {args.input} is empty")
 
-    rewritten, usage = paraphrase(text, args.model, args.temperature, api_key)
+    guidance = args.guidance_file.read_text(encoding="utf-8") if args.guidance_file else ""
+    rewritten, usage = paraphrase(text, args.model, args.temperature, api_key, guidance)
     args.output.write_text(rewritten, encoding="utf-8")
     print(
         f"{args.output}  words {len(text.split())} -> {len(rewritten.split())}  "
