@@ -1,0 +1,20 @@
+skills/obsidian-vault/SKILL.md
+  s_37054322a6e7a0::t_084989f0356b47 40-42
+  s_37054322a6e7a0::t_d6736739731d61 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "13ace11f845b6c60bb92632d454e83a8fae0abe4",
+  "prompts": {},
+  "sessions": {
+    "s_37054322a6e7a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bde8f92-964f-437e-bd09-d96ccf7acf79",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Youssef <48566436+ya222@users.noreply.github.com>"
+    }
+  }
+}
