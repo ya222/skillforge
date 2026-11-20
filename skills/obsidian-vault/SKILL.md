@@ -3,7 +3,7 @@ name: obsidian-vault
 description: Finds, reads, creates and edits notes in the user's Obsidian vault at {{ params.vault_path }}, from any project. Use when the user mentions Obsidian, their vault or their notes, or asks to look something up in, save something to, or update a note.
 metadata:
   skillforge:
-    version: 1.1.0
+    version: 1.1.1
     params:
       vault_path:
         type: string
@@ -86,17 +86,12 @@ committing.
 
 ## Cloud
 
-1. Attach `{{ params.vault_repo }}` with the session's GitHub integration (`add_repo`, with push
-   access), then clone it with `git clone --depth 1 --branch {{ params.vault_branch }}` and a long
-   timeout.
-2. Notes change on the user's devices while you work. Right before each edit, run
-   `git pull --rebase origin {{ params.vault_branch }}` and re-read the notes you're changing, so
-   your edit lands on their latest version. Never overwrite their changes.
+1. The vault is `{{ params.vault_repo }}` on GitHub, branch `{{ params.vault_branch }}`. Attach
+   it with the session's GitHub integration (`add_repo`, with push access) and browse through
+   the API.
+2. Notes change on the user's devices while you work. Right before editing, re-read the notes
+   you're changing, so your edit lands on their latest version. Never overwrite their changes.
 3. Commit with a short message, using the session's attribution guidance.
 4. Before every push, show the user the changed files and the commit message and ask. Push to
    `{{ params.vault_branch }}` only after they say yes.
-5. If the push is rejected because the branch moved, pull with rebase again and ask again before
-   pushing. If a rebase conflicts, run `git rebase --abort` and
-   `git reset --hard origin/{{ params.vault_branch }}`, reapply your edit, and ask again. Never
-   force-push.
 <!-- /skillforge:block -->
