@@ -97,7 +97,7 @@ params and marks the passages consumers are allowed to change. See
 | [`markdown-kanban`](skills/markdown-kanban/SKILL.md) | Keep project todo boards in the Markdown Kanban format, one board per workstream |
 | [`cloudflare-quick-tunnel`](skills/cloudflare-quick-tunnel/SKILL.md) | Put a local server on a public HTTPS URL with `cloudflared`, and know the limits |
 | [`claude-session-export`](skills/claude-session-export/SKILL.md) | Export a Claude Code session to Markdown with a script, without loading it into context |
-| [`obsidian-vault`](skills/obsidian-vault/SKILL.md) | Find, create and edit notes in a local Obsidian vault from any project |
+| [`obsidian-vault`](skills/obsidian-vault/SKILL.md) | Find, create and edit notes in a local Obsidian vault from any project, or in its GitHub repository from cloud sessions |
 | [`deepseek-paraphrase`](skills/deepseek-paraphrase/SKILL.md) | Reword text with DeepSeek through a script, keeping meaning and structure |
 | [`security-audit`](skills/security-audit/SKILL.md) | Source-first security review or full multi-agent audit, with validators for its findings |
 | [`live-flowchart`](skills/live-flowchart/SKILL.md) | Draw the code as live flowcharts in a claude.ai Artifact, checked against the repository, with build progress on the boxes |

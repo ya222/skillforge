@@ -3,11 +3,19 @@ name: obsidian-vault
 description: Finds, reads, creates and edits notes in the user's Obsidian vault at {{ params.vault_path }}, from any project. Use when the user mentions Obsidian, their vault or their notes, or asks to look something up in, save something to, or update a note.
 metadata:
   skillforge:
-    version: 1.0.0
+    version: 1.1.0
     params:
       vault_path:
         type: string
         description: Absolute path to the local Obsidian vault, the folder that contains `.obsidian/`.
+      vault_repo:
+        type: string
+        description: GitHub repository (`owner/name`) that holds the vault. When set, the skill also works in cloud sessions, where the local vault is absent.
+        default: ""
+      vault_branch:
+        type: string
+        description: Branch of `vault_repo` that cloud sessions pull from and push to.
+        default: main
 ---
 
 # Obsidian vault
@@ -16,8 +24,23 @@ The user's Obsidian vault is `{{ params.vault_path }}`: plain markdown files, on
 in folders the user arranged. Work on the files directly, from whatever directory this session
 started in.
 
+<!-- skillforge:block id=path-check when='not params.vault_repo' -->
 If that folder or its `.obsidian/` directory is missing, stop and tell the user the configured
 path is wrong. Don't search the disk for another vault.
+<!-- /skillforge:block -->
+
+<!-- skillforge:block id=routing when='params.vault_repo' -->
+## Where you're running
+
+Check whether `{{ params.vault_path }}` exists.
+
+- **Local** (it exists): work on that folder. If it has no `.obsidian/` directory, stop and tell
+  the user the configured path is wrong; don't search the disk for another vault. Skip the
+  **Cloud** section.
+- **Cloud** (it doesn't): work on a clone of `{{ params.vault_repo }}`. Follow the **Cloud**
+  section in place of **Before reading or editing** and **Syncing**. The other sections apply to
+  the clone.
+<!-- /skillforge:block -->
 
 <!-- skillforge:point id=after-intro -->
 
@@ -59,3 +82,21 @@ If `.obsidian/plugins/obsidian-git/` exists, that plugin commits, pushes and pul
 while Obsidian is open, so leave git to it: don't commit or push from this session. Changes made
 while Obsidian is closed sync the next time it opens. Without the plugin, ask the user before
 committing.
+<!-- skillforge:block id=cloud when='params.vault_repo' -->
+
+## Cloud
+
+1. Attach `{{ params.vault_repo }}` with the session's GitHub integration (`add_repo`, with push
+   access), then clone it with `git clone --depth 1 --branch {{ params.vault_branch }}` and a long
+   timeout.
+2. Notes change on the user's devices while you work. Right before each edit, run
+   `git pull --rebase origin {{ params.vault_branch }}` and re-read the notes you're changing, so
+   your edit lands on their latest version. Never overwrite their changes.
+3. Commit with a short message, using the session's attribution guidance.
+4. Before every push, show the user the changed files and the commit message and ask. Push to
+   `{{ params.vault_branch }}` only after they say yes.
+5. If the push is rejected because the branch moved, pull with rebase again and ask again before
+   pushing. If a rebase conflicts, run `git rebase --abort` and
+   `git reset --hard origin/{{ params.vault_branch }}`, reapply your edit, and ask again. Never
+   force-push.
+<!-- /skillforge:block -->
