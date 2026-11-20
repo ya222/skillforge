@@ -3,7 +3,7 @@ name: obsidian-vault
 description: Finds, reads, creates and edits notes in the user's Obsidian vault at {{ params.vault_path }}, from any project. Use when the user mentions Obsidian, their vault or their notes, or asks to look something up in, save something to, or update a note.
 metadata:
   skillforge:
-    version: 1.1.1
+    version: 1.1.2
     params:
       vault_path:
         type: string
@@ -37,9 +37,9 @@ Check whether `{{ params.vault_path }}` exists.
 - **Local** (it exists): work on that folder. If it has no `.obsidian/` directory, stop and tell
   the user the configured path is wrong; don't search the disk for another vault. Skip the
   **Cloud** section.
-- **Cloud** (it doesn't): work on a clone of `{{ params.vault_repo }}`. Follow the **Cloud**
-  section in place of **Before reading or editing** and **Syncing**. The other sections apply to
-  the clone.
+- **Cloud** (it doesn't): the vault is `{{ params.vault_repo }}` on GitHub. Follow the **Cloud**
+  section in place of **Before reading or editing** and **Syncing**. The other sections still
+  apply.
 <!-- /skillforge:block -->
 
 <!-- skillforge:point id=after-intro -->
